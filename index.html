@@ -19,7 +19,8 @@
     --envelopeW:340px;
     --envelopeH:230px;
 
-    --cardMax:520px;
+    --cardMax:560px;
+    --cardMinH:230px;
   }
 
   *{ box-sizing:border-box; }
@@ -77,10 +78,10 @@
     overflow:hidden;
   }
 
-  /* BACK SIDE (address + stamp) */
+  /* BACK SIDE */
   .back{ background:#fff; }
 
-  /* FRONT SIDE (flap) */
+  /* FRONT SIDE */
   .front{
     transform:rotateY(180deg);
     background:#fff;
@@ -88,7 +89,7 @@
 
   .tofrom{
     position:absolute;
-    top:14px;
+    top:16px;
     left:16px;
     font-size:18px;
     line-height:1.25;
@@ -96,18 +97,19 @@
     color:#1f1f1f;
   }
 
-  .stamp-wrap{
+  /* Stamp block (top right) */
+  .stamp-area{
     position:absolute;
-    right:14px;
     top:14px;
-    width:110px;
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:10px;
+    right:14px;
+    width:104px;
+    height:130px;
   }
 
   .stamp-img{
+    position:absolute;
+    top:0;
+    right:0;
     width:92px;
     height:auto;
     border-radius:6px;
@@ -117,10 +119,12 @@
     background:#fff;
   }
 
-  /* Ink delivered stamp */
+  /* Ink delivered stamp overlaps the stamp image */
   .ink-stamp{
-    align-self:flex-start;
-    transform:rotate(-10deg);
+    position:absolute;
+    top:56px;          /* overlap region */
+    right:6px;
+    transform:rotate(-12deg);
     border:3px solid var(--ink);
     color:var(--ink);
     padding:8px 10px;
@@ -128,8 +132,9 @@
     font-weight:700;
     font-size:12px;
     letter-spacing:.4px;
-    background:rgba(255,255,255,.6);
-    box-shadow:0 5px 10px rgba(0,0,0,.08);
+    background:rgba(255,255,255,.75);
+    box-shadow:0 5px 10px rgba(0,0,0,.10);
+    pointer-events:none;
   }
   .ink-stamp .big{
     display:block;
@@ -139,7 +144,8 @@
   .ink-stamp .small{
     display:block;
     font-size:11px;
-    opacity:.9;
+    opacity:.95;
+    white-space:nowrap;
   }
 
   /* Flap */
@@ -164,29 +170,29 @@
     pointer-events:none;
   }
 
-  /* OVERLAY (click outside to close) */
+  /* OVERLAY (spaces around letter so background shows) */
   .overlay{
     position:fixed;
     inset:0;
     display:none;
     place-items:center;
-    padding:16px;
-    background:rgba(0,0,0,.28);
+    padding:22px; /* <-- space so you can see the old background */
+    background:rgba(0,0,0,.18);
   }
 
-  .letter-card{
+  .card{
     width:min(92vw, var(--cardMax));
-    max-height:86vh;
+    max-height:82vh;
     overflow:auto;
     background:white;
     border-radius:18px;
     box-shadow:0 22px 55px rgba(0,0,0,.24);
     padding:16px 16px 22px;
     position:relative;
-    min-height:var(--envelopeH);
+    min-height:var(--cardMinH);
   }
 
-  .letter-header{
+  .card-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -196,12 +202,9 @@
     margin-bottom:12px;
   }
 
-  .letter-title{
+  .card-title{
     font-weight:800;
     font-size:18px;
-    display:flex;
-    align-items:center;
-    gap:8px;
   }
 
   .close{
@@ -213,11 +216,14 @@
     background:rgba(0,0,0,.06);
     transition:transform .15s ease, background .15s ease;
   }
-  .close:hover{ background:rgba(0,0,0,.1); transform:translateY(-1px); }
+  .close:hover{ background:rgba(0,0,0,.10); transform:translateY(-1px); }
   .close:active{ transform:scale(.98); }
 
+  /* Images fit inside letter */
   .photo{
     width:100%;
+    height:clamp(140px, 28vh, 240px);
+    object-fit:cover;
     border-radius:14px;
     margin:10px 0 14px;
   }
@@ -225,37 +231,36 @@
   /* typing line */
   .type{
     font-size:22px;
-    font-weight:700;
+    font-weight:800;
     border-right:3px solid rgba(255,77,109,.55);
     overflow:hidden;
     white-space:nowrap;
     width:0;
-    animation:typing 2.6s steps(36,end) forwards;
+    animation:typing 2.4s steps(34,end) forwards;
   }
   @keyframes typing{ to{ width:100%; } }
 
-  /* Buttons */
   .btn-row{
     margin-top:18px;
     display:flex;
     gap:12px;
     flex-wrap:wrap;
     align-items:center;
+    position:relative;
+    min-height:60px; /* space for NO button to move without overlapping layout too much */
   }
 
-  button{
-    font-size:18px;
-    padding:12px 20px;
-    border:none;
-    cursor:pointer;
-    font-family:inherit;
-    font-weight:800;
-  }
-
-  /* pill style */
+  /* Rounded pill, non-cursive font, lower-case text */
   .pill{
+    font-family:'Quicksand', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size:18px;
+    font-weight:800;
+    padding:12px 22px;
+    border:none;
     border-radius:999px;
-    letter-spacing:.5px;
+    cursor:pointer;
+    letter-spacing:.3px;
+    text-transform:lowercase; /* ensures it shows "yes" and "no" */
     transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
     box-shadow:0 12px 24px rgba(0,0,0,.12);
   }
@@ -274,40 +279,20 @@
   .no{
     background:#2f2f2f;
     color:white;
-    position:relative; /* we move this around */
+    position:relative; /* will become absolute once we start moving it */
   }
 
-  .response-card{
-    margin-top:16px;
-    display:none;
-    padding:14px 14px;
-    border-radius:16px;
-    background:linear-gradient(180deg, rgba(255,214,231,.65), rgba(255,194,209,.45));
-    border:1px solid rgba(0,0,0,.06);
+  .hidden{ display:none !important; }
+
+  .response-text{
     font-size:18px;
-    line-height:1.4;
-  }
-
-  /* HEARTS */
-  .heart{
-    position:fixed;
-    bottom:-20px;
-    font-size:26px;
-    animation:float 8s linear;
-    pointer-events:none;
-  }
-  @keyframes float{
-    to{ transform:translateY(-110vh); opacity:0;}
+    line-height:1.5;
+    font-weight:700;
   }
 </style>
 </head>
 
 <body>
-
-<!-- Music: keep loop + preload, and we "unlock" it on first click -->
-<audio id="music" loop preload="auto">
-  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3" type="audio/mpeg">
-</audio>
 
 <div class="mailbox" id="mailbox" aria-label="Mailbox">
   <div class="flag"></div>
@@ -315,18 +300,18 @@
 </div>
 
 <div class="envelope" id="envelope" aria-label="Envelope">
+
   <!-- BACK -->
   <div class="face back">
     <div class="tofrom">
-      To Aaron 💗<br>
-      From Rizza 🎀
+      To Aaron<br>
+      From Rizza
     </div>
 
-    <div class="stamp-wrap">
-      <!-- Replace with your real stamp image path -->
+    <div class="stamp-area">
+      <!-- IMPORTANT: replace this with a real path/URL in your project. /mnt/data won't work on a normal website -->
       <img src="/mnt/data/A6557CED-4142-4432-9A0C-4FAC89CBEEA0.png" class="stamp-img" alt="Stamp">
-
-      <div class="ink-stamp" id="inkStamp">
+      <div class="ink-stamp" aria-hidden="true">
         <span class="big">DELIVERED</span>
         <span class="small" id="stampDate"></span>
       </div>
@@ -339,26 +324,40 @@
   </div>
 </div>
 
-<!-- LETTER OVERLAY -->
-<div class="overlay" id="overlay">
-  <div class="letter-card" id="letterCard" role="dialog" aria-modal="true">
-    <div class="letter-header">
-      <div class="letter-title">💖 Special Note</div>
-      <button class="close" id="closeBtn" aria-label="Close">✕</button>
+<!-- FIRST LETTER -->
+<div class="overlay" id="overlayLetter">
+  <div class="card" id="letterCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Special Note</div>
+      <button class="close" id="closeLetterBtn" aria-label="Close">✕</button>
     </div>
 
-    <!-- Replace with your real photo path -->
-    <img src="photo.jpeg" class="photo" alt="Photo">
+    <img src="photo.jpeg" class="photo" alt="Photo 1">
 
-    <div class="type">Will you be my Valentine? 💕</div>
+    <div class="type">Will you be my Valentine?</div>
 
-    <div class="btn-row" style="margin-top:22px;">
-      <button class="yes pill" id="yesBtn">YES</button>
-      <button class="no pill" id="noBtn">NO</button>
+    <div class="btn-row" id="btnRow">
+      <button class="pill yes" id="yesBtn">yes</button>
+      <button class="pill no" id="noBtn">no</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESPONSE LETTER -->
+<div class="overlay" id="overlayResponse">
+  <div class="card" id="responseCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Message</div>
+      <button class="close" id="closeResponseBtn" aria-label="Close">✕</button>
     </div>
 
-    <!-- second card for YES response -->
-    <div class="response-card" id="responseCard"></div>
+    <img src="photo2.jpeg" class="photo" alt="Photo 2">
+
+    <div class="response-text">
+      I love you ♥️ Thank you for being my valentine.<br><br>
+      I cant wait for our hiking date this weekend.<br><br>
+      PS. I wouldn’t have taken no for an answer.
+    </div>
   </div>
 </div>
 
@@ -367,46 +366,24 @@
   const envelope = document.getElementById("envelope");
   const flap = document.getElementById("flap");
 
-  const overlay = document.getElementById("overlay");
+  const overlayLetter = document.getElementById("overlayLetter");
   const letterCard = document.getElementById("letterCard");
-  const closeBtn = document.getElementById("closeBtn");
+  const closeLetterBtn = document.getElementById("closeLetterBtn");
 
-  const music = document.getElementById("music");
+  const overlayResponse = document.getElementById("overlayResponse");
+  const responseCard = document.getElementById("responseCard");
+  const closeResponseBtn = document.getElementById("closeResponseBtn");
 
   const yesBtn = document.getElementById("yesBtn");
   const noBtn = document.getElementById("noBtn");
-  const responseCard = document.getElementById("responseCard");
-  const stampDate = document.getElementById("stampDate");
+  const btnRow = document.getElementById("btnRow");
 
   let noClicks = 0;
-  let heartsInterval = null;
-  let audioUnlocked = false;
 
   /* DATE STAMP */
   const today = new Date();
-  stampDate.innerText = today.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
-
-  /* AUDIO UNLOCK: browsers require a user gesture before play() works */
-  function unlockAudioOnce(){
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-    music.muted = true;
-    const p = music.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
-        music.pause();
-        music.currentTime = 0;
-        music.muted = false;
-      }).catch(() => {
-        // If it fails here, it will still work when YES is clicked (user gesture).
-        music.muted = false;
-      });
-    } else {
-      music.muted = false;
-    }
-  }
-
-  window.addEventListener("pointerdown", unlockAudioOnce, { once:true });
+  document.getElementById("stampDate").innerText =
+    today.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
 
   /* MAILBOX -> ENVELOPE */
   mailbox.addEventListener("click", () => {
@@ -416,83 +393,68 @@
 
   /* FLIP ENVELOPE (click envelope) */
   envelope.addEventListener("click", (e) => {
-    // avoid envelope flip when clicking flap
     if (e.target === flap) return;
     envelope.classList.toggle("flip");
   });
 
-  /* OPEN LETTER */
+  /* OPEN FIRST LETTER */
   flap.addEventListener("click", (e) => {
     e.stopPropagation();
     openLetter();
   });
 
   function openLetter(){
-    overlay.style.display = "grid";
-    // reset NO button position each open (optional)
-    noBtn.style.left = "0px";
-    noBtn.style.top = "0px";
-    noBtn.style.transform = "none";
-    noBtn.disabled = false;
-    noClicks = 0;
-
-    // hide response card on open
-    responseCard.style.display = "none";
-    responseCard.innerHTML = "";
+    overlayLetter.style.display = "grid";
+    resetNoButton();
   }
 
-  /* CLOSE -> back to envelope */
   function closeLetter(){
-    overlay.style.display = "none";
+    overlayLetter.style.display = "none";
   }
 
-  closeBtn.addEventListener("click", closeLetter);
+  function openResponse(){
+    overlayResponse.style.display = "grid";
+  }
 
-  /* click outside card closes */
-  overlay.addEventListener("click", () => closeLetter());
+  function closeResponse(){
+    overlayResponse.style.display = "none";
+  }
+
+  closeLetterBtn.addEventListener("click", closeLetter);
+  closeResponseBtn.addEventListener("click", closeResponse);
+
+  /* click outside closes */
+  overlayLetter.addEventListener("click", () => closeLetter());
   letterCard.addEventListener("click", (e) => e.stopPropagation());
 
-  /* YES */
-  yesBtn.addEventListener("click", async () => {
-    // show second card (not inline replacing the question)
-    responseCard.style.display = "block";
-    responseCard.innerHTML =
-      "Ahhh yay!! 💞<br><br>" +
-      "I love you!<br><br>" +
-      "See you on our Valentine’s date this weekend 💗";
+  overlayResponse.addEventListener("click", () => closeResponse());
+  responseCard.addEventListener("click", (e) => e.stopPropagation());
 
-    try{
-      await music.play();
-    }catch(err){
-      // If autoplay policy blocks, user can tap again; but this should work since it's a click.
-      console.warn("Music play blocked:", err);
-    }
-
-    startHearts();
-    navigator.vibrate?.(200);
+  /* YES: hide first letter, open response */
+  yesBtn.addEventListener("click", () => {
+    closeLetter();
+    openResponse();
   });
 
-  /* NO GAME */
+  /* NO: move 5 times, 6th flies away */
   noBtn.addEventListener("click", () => {
     noClicks++;
 
     if (noClicks <= 5){
-      // Move within the visible card area
-      const cardRect = letterCard.getBoundingClientRect();
+      const rowRect = btnRow.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
 
-      const maxX = Math.max(0, cardRect.width - btnRect.width - 24);
-      const maxY = Math.max(0, cardRect.height - btnRect.height - 24);
+      // limit movement within the button row area
+      const maxX = Math.max(0, rowRect.width - btnRect.width - 12);
+      const maxY = Math.max(0, rowRect.height - btnRect.height - 12);
 
       const x = Math.random() * maxX;
       const y = Math.random() * maxY;
 
-      // Use translate so layout doesn't jump
       noBtn.style.position = "absolute";
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
     } else {
-      // 6th click: fly away + disappear
       noBtn.disabled = true;
       noBtn.style.transition = "transform .8s ease, opacity .8s ease";
       noBtn.style.transform = "translateY(-500px) rotate(-18deg)";
@@ -501,19 +463,16 @@
     }
   });
 
-  /* HEARTS */
-  function startHearts(){
-    if (heartsInterval) return; // don't start multiple
-
-    heartsInterval = setInterval(() => {
-      const h = document.createElement("div");
-      h.className = "heart";
-      // cuter girly emojis
-      h.innerText = ["💖","💗","💞","🎀","✨","🌸"][Math.floor(Math.random()*6)];
-      h.style.left = Math.random() * 100 + "vw";
-      document.body.appendChild(h);
-      setTimeout(() => h.remove(), 8000);
-    }, 800);
+  function resetNoButton(){
+    noClicks = 0;
+    noBtn.style.display = "inline-block";
+    noBtn.disabled = false;
+    noBtn.style.transition = "";
+    noBtn.style.opacity = "1";
+    noBtn.style.transform = "none";
+    noBtn.style.position = "relative";
+    noBtn.style.left = "0px";
+    noBtn.style.top = "0px";
   }
 </script>
 
