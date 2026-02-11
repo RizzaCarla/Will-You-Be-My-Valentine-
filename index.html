@@ -441,6 +441,59 @@ function resetNoButton(){
 }
 
 noBtn.onclick = () => {
+  /* ===============================
+   DESKTOP HOVER PROXIMITY LOGIC
+   =============================== */
+
+if (window.matchMedia("(hover: hover)").matches) {
+
+  let hoverAttempts = 0;
+  const HOVER_LIMIT = 4;
+  const RADIUS = 20;
+
+  function teleportNoButton() {
+    noBtn.style.position = "fixed";
+    noBtn.style.zIndex = "9999";
+
+    const pad = 20;
+    const x = Math.random() * (window.innerWidth  - pad * 2) + pad;
+    const y = Math.random() * (window.innerHeight - pad * 2) + pad;
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+  }
+
+  document.addEventListener("mousemove", (e) => {
+    if (noBtn.disabled) return;
+
+    const rect = noBtn.getBoundingClientRect();
+
+    const nearestX = Math.max(rect.left, Math.min(e.clientX, rect.right));
+    const nearestY = Math.max(rect.top,  Math.min(e.clientY, rect.bottom));
+
+    const dx = e.clientX - nearestX;
+    const dy = e.clientY - nearestY;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= RADIUS) {
+
+      hoverAttempts++;
+
+      if (hoverAttempts < HOVER_LIMIT) {
+        teleportNoButton();
+      } else {
+        noBtn.disabled = true;
+        noBtn.style.transition = "transform .8s ease, opacity .8s ease";
+        noBtn.style.transform = "translateY(-600px) rotate(-15deg)";
+        noBtn.style.opacity = "0";
+        setTimeout(() => noBtn.style.display = "none", 800);
+      }
+    }
+  });
+
+}
+
   noClicks++;
 
   noBtn.style.position = "fixed";
