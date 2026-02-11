@@ -39,9 +39,9 @@ body{
   position:relative;
   cursor:pointer;
   box-shadow:0 18px 35px rgba(0,0,0,.18);
-  transition:.3s ease;
+  transition:.35s ease;
 }
-.mailbox.opening{transform:scale(.9);opacity:0;}
+.mailbox.opening{transform:scale(.92) translateY(6px);opacity:0;pointer-events:none;}
 
 .flag-pole{
   position:absolute;
@@ -61,46 +61,39 @@ body{
   position:absolute;top:70px;left:40px;border-radius:10px;
 }
 
-/* ---------------- ENVELOPE 3D ---------------- */
+/* ---------------- ENVELOPE ---------------- */
 .envelope-scene{
   display:none;
   width:var(--envelopeW);
   height:var(--envelopeH);
   perspective:1200px;
 }
-
 .envelope-card{
   width:100%;height:100%;
   position:relative;
   transform-style:preserve-3d;
-  transition:transform .8s cubic-bezier(.2,.9,.2,1);
+  transition:.8s cubic-bezier(.2,.9,.2,1);
   border-radius:12px;
   box-shadow:0 18px 40px rgba(0,0,0,.18);
   cursor:pointer;
 }
-
 .envelope-card.showBack{transform:rotateY(0deg);}
 .envelope-card.showFront{transform:rotateY(180deg);}
 
 .face{
-  position:absolute;
-  inset:0;
+  position:absolute;inset:0;
   backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
   border-radius:12px;
   overflow:hidden;
   background:#fff;
 }
-
 .back{transform:rotateY(0deg);}
 .front{transform:rotateY(180deg);}
 
-/* Back content */
 .tofrom{
   position:absolute;
   top:16px;left:16px;
-  font-weight:800;
-  font-size:18px;
+  font-weight:800;font-size:18px;
 }
 
 .stamp-area{
@@ -113,13 +106,11 @@ body{
   align-items:flex-end;
 }
 
-/* Heart stamp */
 .forever-stamp{
   width:118px;height:148px;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.18));
 }
 
-/* Delivery stamp */
 .delivery-stamp{
   width:132px;height:56px;
   border:3px solid var(--deliveryRed);
@@ -134,7 +125,7 @@ body{
   background:rgba(143,16,35,.06);
   padding:6px;
 }
-.delivery-stamp div{line-height:1.1;font-size:12px;}
+.delivery-stamp div{font-size:11px;line-height:1.1;}
 
 .flap{
   position:absolute;
@@ -147,10 +138,9 @@ body{
 }
 .flap.opened{transform:rotateX(160deg);}
 
-/* ---------------- LETTER ---------------- */
+/* ---------------- LETTERS ---------------- */
 .overlay{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   display:none;
   place-items:center;
   padding:20px;
@@ -164,26 +154,42 @@ body{
   overflow:auto;
   background:#fff;
   border-radius:18px;
-  padding:18px;
+  padding:16px 16px 22px;
   box-shadow:0 22px 55px rgba(0,0,0,.25);
   position:relative;
+}
+
+/* HEADERS RESTORED */
+.card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(0,0,0,.08);
+  margin-bottom:12px;
+}
+.card-title{font-weight:800;font-size:18px;}
+
+.close{
+  width:42px;height:42px;
+  border:none;border-radius:14px;
+  background:rgba(0,0,0,.06);
+  cursor:pointer;
+  font-size:20px;
 }
 
 .photo{
   width:100%;
   height:auto;
   border-radius:14px;
-  margin:10px 0;
+  margin:10px 0 14px;
 }
 
 .type{
-  font-size:22px;
-  font-weight:800;
+  font-size:22px;font-weight:800;
   border-right:3px solid var(--accent);
-  white-space:nowrap;
-  overflow:hidden;
-  width:0;
-  animation:typing 2s steps(30,end) forwards;
+  white-space:nowrap;overflow:hidden;width:0;
+  animation:typing 2.2s steps(34,end) forwards;
 }
 @keyframes typing{to{width:100%;}}
 
@@ -192,19 +198,34 @@ body{
   display:flex;
   gap:12px;
   position:relative;
-  min-height:60px;
+  min-height:64px;
 }
 
+/* ---- POLISHED PILL DESIGN RESTORED ---- */
 .pill{
+  font-family:'Quicksand',sans-serif;
+  font-size:18px;
+  font-weight:800;
   padding:12px 22px;
   border:none;
   border-radius:999px;
-  font-weight:800;
   cursor:pointer;
+  letter-spacing:.3px;
+  text-transform:lowercase;
+  transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
+  box-shadow:0 12px 24px rgba(0,0,0,.12);
   position:relative;
+  z-index:3;
 }
+.pill:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.02);
+  box-shadow:0 16px 30px rgba(0,0,0,.16);
+}
+.pill:active{transform:translateY(0) scale(.98);}
+
 .yes{background:var(--accent);color:#fff;}
-.no{background:#333;color:#fff;}
+.no{background:#2f2f2f;color:#fff;}
 
 .yes.boop{animation:yesBoop 2.4s ease-in-out infinite;}
 @keyframes yesBoop{
@@ -214,21 +235,11 @@ body{
 }
 
 .heart{
-  position:fixed;
-  bottom:-20px;
+  position:fixed;bottom:-20px;
   font-size:26px;
-  animation:float 7s linear;
+  animation:float 7.5s linear;
 }
 @keyframes float{to{transform:translateY(-110vh);opacity:0;}}
-
-.close{
-  position:absolute;
-  top:12px;right:12px;
-  border:none;background:#eee;
-  width:40px;height:40px;
-  border-radius:10px;
-  cursor:pointer;
-}
 </style>
 </head>
 
@@ -250,17 +261,8 @@ body{
       </div>
 
       <div class="stamp-area">
-
-        <!-- Simple heart stamp -->
         <svg class="forever-stamp" viewBox="0 0 220 280">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ff4d8a"/>
-              <stop offset="100%" stop-color="#b0192b"/>
-            </linearGradient>
-          </defs>
-          <rect x="12" y="12" width="196" height="256" rx="14" fill="url(#g)"/>
-          <text x="28" y="50" fill="#fff" font-size="22" font-weight="800">us forever</text>
+          <rect x="12" y="12" width="196" height="256" rx="14" fill="#b0192b"/>
           <path d="M110 140
                    C110 110,150 110,150 140
                    C150 165,110 190,110 190
@@ -274,7 +276,6 @@ body{
           <div>CUPID POST OFFICE</div>
           <div id="deliveryDate"></div>
         </div>
-
       </div>
     </div>
 
@@ -285,13 +286,18 @@ body{
   </div>
 </div>
 
-<!-- LETTER -->
+<!-- FIRST LETTER -->
 <div class="overlay" id="overlayLetter">
   <div class="card" id="letterCard">
-    <button class="close" id="closeLetter">✕</button>
+    <div class="card-header">
+      <div class="card-title">Special Note</div>
+      <button class="close" id="closeLetter">✕</button>
+    </div>
+
     <img src="photo.jpeg" class="photo">
     <div class="type">Will you be my Valentine?</div>
-    <div class="btn-row" id="btnRow">
+
+    <div class="btn-row">
       <button class="pill yes boop" id="yesBtn">yes</button>
       <button class="pill no" id="noBtn">no</button>
     </div>
@@ -301,7 +307,11 @@ body{
 <!-- RESPONSE -->
 <div class="overlay" id="overlayResponse">
   <div class="card">
-    <button class="close" id="closeResponse">✕</button>
+    <div class="card-header">
+      <div class="card-title">Message</div>
+      <button class="close" id="closeResponse">✕</button>
+    </div>
+
     <img src="photo2.jpeg" class="photo">
     I love you ♥️ Thank you for being my valentine.<br><br>
     I cant wait for our hiking date this weekend.<br><br>
@@ -325,37 +335,54 @@ const noBtn=document.getElementById("noBtn");
 document.getElementById("deliveryDate").textContent=
  new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
 
+function showBack(){envelopeCard.classList.add("showBack");envelopeCard.classList.remove("showFront");}
+function showFront(){envelopeCard.classList.add("showFront");envelopeCard.classList.remove("showBack");}
+
 mailbox.onclick=()=>{
  mailbox.classList.add("opening");
  setTimeout(()=>{
   mailbox.style.display="none";
   envelopeScene.style.display="block";
+  showBack();
  },300);
 };
 
-function toggleFlip(){
- envelopeCard.classList.toggle("showFront");
- envelopeCard.classList.toggle("showBack");
-}
-
 envelopeCard.onclick=(e)=>{
  if(e.target===flap)return;
- toggleFlip();
+ if(envelopeCard.classList.contains("showBack"))showFront();else showBack();
 };
 
 flap.onclick=(e)=>{
  e.stopPropagation();
- if(envelopeCard.classList.contains("showBack")){
-  toggleFlip();
-  return;
- }
+ if(envelopeCard.classList.contains("showBack")){showFront();return;}
  flap.classList.add("opened");
  setTimeout(()=>overlayLetter.classList.add("show"),300);
 };
 
+function resetExperience(){
+ flap.classList.remove("opened");
+ showFront();
+ noBtn.style.position="relative";
+ noBtn.style.left="0";
+ noBtn.style.top="0";
+ noBtn.style.transform="scale(1)";
+ noBtn.style.opacity="1";
+ noBtn.style.display="inline-block";
+ noClicks=0;
+ stopHearts();
+}
+
 document.getElementById("closeLetter").onclick=()=>{
  overlayLetter.classList.remove("show");
- flap.classList.remove("opened");
+ resetExperience();
+};
+
+document.getElementById("closeResponse").onclick=()=>{
+ overlayResponse.classList.remove("show");
+ resetExperience();
+ mailbox.style.display="block";
+ envelopeScene.style.display="none";
+ mailbox.classList.remove("opening");
 };
 
 yesBtn.onclick=()=>{
@@ -364,21 +391,18 @@ yesBtn.onclick=()=>{
  startHearts();
 };
 
-document.getElementById("closeResponse").onclick=()=>{
- overlayResponse.classList.remove("show");
-};
-
 let noClicks=0;
 noBtn.onclick=()=>{
  noClicks++;
  const scale=Math.max(.55,1-(noClicks*.16));
  noBtn.style.transform=`scale(${scale})`;
+ noBtn.style.position="absolute";
 
  if(noClicks<=3){
-  const rect=letterCard.getBoundingClientRect();
-  noBtn.style.position="absolute";
-  noBtn.style.left=Math.random()*(rect.width-120)+"px";
-  noBtn.style.top=Math.random()*(rect.height-60)+"px";
+  const maxX=letterCard.scrollWidth-noBtn.offsetWidth-20;
+  const maxY=letterCard.scrollHeight-noBtn.offsetHeight-20;
+  noBtn.style.left=Math.random()*maxX+"px";
+  noBtn.style.top=Math.random()*maxY+"px";
  }else{
   noBtn.style.transition=".8s";
   noBtn.style.transform=`translateY(-500px) scale(${scale})`;
@@ -387,15 +411,22 @@ noBtn.onclick=()=>{
  }
 };
 
+let heartsInterval=null;
 function startHearts(){
- setInterval(()=>{
-  let h=document.createElement("div");
+ if(heartsInterval)return;
+ heartsInterval=setInterval(()=>{
+  const h=document.createElement("div");
   h.className="heart";
   h.innerText=["💖","💗","💞","✨"][Math.floor(Math.random()*4)];
   h.style.left=Math.random()*100+"vw";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),7000);
  },700);
+}
+function stopHearts(){
+ if(!heartsInterval)return;
+ clearInterval(heartsInterval);
+ heartsInterval=null;
 }
 </script>
 
