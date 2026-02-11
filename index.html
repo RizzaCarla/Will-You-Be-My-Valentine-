@@ -229,12 +229,17 @@ body{
   z-index:3;
   line-height:1;
 }
+  
 .pill:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.02);
-  box-shadow:0 16px 30px rgba(0,0,0,.16);
+  transform:none;
+  filter:none;
+  box-shadow:0 12px 24px rgba(0,0,0,.12);
 }
-.pill:active{transform:translateY(0);}
+
+.pill:active{
+  transform:none;
+}
+
 
 .yes{background:var(--accent);color:#fff;}
 .no{background:#2f2f2f;color:#fff;z-index:10;}
