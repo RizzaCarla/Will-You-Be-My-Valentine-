@@ -1,262 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Special Delivery 💌</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  font-family:'Dancing Script',cursive;
-  background:linear-gradient(135deg,#ffd6e7,#ffc2d1);
-  height:100vh;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+  :root{
+    --pink1:#ffd6e7;
+    --pink2:#ffc2d1;
+    --accent:#ff4d6d;
+    --ink:#2c2c2c;
 
-/* MAILBOX */
-.mailbox{
-  width:200px;height:160px;
-  background:#ff4d6d;
-  border-radius:20px;
-  position:relative;
-  cursor:pointer;
-}
-.flag{width:10px;height:60px;background:white;position:absolute;right:-15px;top:20px;}
-.mail-slot{width:120px;height:20px;background:#333;position:absolute;top:70px;left:40px;border-radius:10px;}
+    --envelopeW:340px;
+    --envelopeH:230px;
 
-/* ENVELOPE */
-.envelope{
-  display:none;
-  width:340px;height:230px;
-  background:white;
-  border-radius:12px;
-  position:relative;
-  transform-style:preserve-3d;
-  transition:1s;
-  cursor:pointer;
-}
-.envelope.flip{ transform:rotateY(180deg); }
+    --cardMax:520px;
+  }
 
-.face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;}
+  *{ box-sizing:border-box; }
 
-/* BACK SIDE */
-.front{ transform:rotateY(180deg); }
+  body{
+    margin:0;
+    font-family:'Quicksand', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,var(--pink1),var(--pink2));
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    user-select:none;
+  }
 
-.tofrom{
-  position:absolute;
-  top:15px;left:20px;
-  font-size:22px;
-}
+  /* MAILBOX */
+  .mailbox{
+    width:200px;height:160px;
+    background:var(--accent);
+    border-radius:20px;
+    position:relative;
+    cursor:pointer;
+    box-shadow:0 18px 35px rgba(0,0,0,.18);
+  }
+  .flag{
+    width:10px;height:60px;background:white;
+    position:absolute;right:-15px;top:20px;border-radius:6px;
+  }
+  .mail-slot{
+    width:120px;height:20px;background:#333;
+    position:absolute;top:70px;left:40px;border-radius:10px;opacity:.9;
+  }
 
-.stamp{
-  position:absolute;
-  right:15px;top:15px;
-  width:90px;
-}
+  /* ENVELOPE */
+  .envelope{
+    display:none;
+    width:var(--envelopeW);
+    height:var(--envelopeH);
+    background:white;
+    border-radius:12px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform 1s;
+    cursor:pointer;
+    box-shadow:0 18px 40px rgba(0,0,0,.18);
+  }
+  .envelope.flip{ transform:rotateY(180deg); }
 
-.postmark{
-  position:absolute;
-  bottom:20px;
-  left:20px;
-  border:3px solid #444;
-  border-radius:50%;
-  padding:12px;
-  font-size:14px;
-  text-align:center;
-}
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:12px;
+    overflow:hidden;
+  }
 
-/* FLAP */
-.flap{
-  position:absolute;
-  border-left:170px solid transparent;
-  border-right:170px solid transparent;
-  border-top:120px solid #ff4d6d;
-  transform-origin:top;
-}
+  /* BACK SIDE (address + stamp) */
+  .back{ background:#fff; }
 
-/* LETTER MODAL */
-.letter{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:white;
-  display:none;
-  flex-direction:column;
-  padding:20px;
-  overflow-y:auto;
-}
+  /* FRONT SIDE (flap) */
+  .front{
+    transform:rotateY(180deg);
+    background:#fff;
+  }
 
-.close{
-  font-size:28px;
-  cursor:pointer;
-}
+  .tofrom{
+    position:absolute;
+    top:14px;
+    left:16px;
+    font-size:18px;
+    line-height:1.25;
+    font-weight:700;
+    color:#1f1f1f;
+  }
 
-.photo{
-  width:100%;
-  border-radius:12px;
-  margin:20px 0;
-}
+  .stamp-wrap{
+    position:absolute;
+    right:14px;
+    top:14px;
+    width:110px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:10px;
+  }
 
-.type{
-  font-size:30px;
-  border-right:3px solid pink;
-  overflow:hidden;
-  white-space:nowrap;
-  width:0;
-  animation:typing 3s steps(40,end) forwards;
-}
-@keyframes typing{ to{ width:100%; } }
+  .stamp-img{
+    width:92px;
+    height:auto;
+    border-radius:6px;
+    border:2px solid rgba(0,0,0,.25);
+    box-shadow:0 8px 16px rgba(0,0,0,.12);
+    display:block;
+    background:#fff;
+  }
 
-button{
-  font-size:24px;
-  padding:10px 20px;
-  margin:20px 10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-family:inherit;
-}
-.yes{ background:#ff4d6d;color:white; }
-.no{ background:#333;color:white; position:absolute;}
+  /* Ink delivered stamp */
+  .ink-stamp{
+    align-self:flex-start;
+    transform:rotate(-10deg);
+    border:3px solid var(--ink);
+    color:var(--ink);
+    padding:8px 10px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:.4px;
+    background:rgba(255,255,255,.6);
+    box-shadow:0 5px 10px rgba(0,0,0,.08);
+  }
+  .ink-stamp .big{
+    display:block;
+    font-size:14px;
+    letter-spacing:1px;
+  }
+  .ink-stamp .small{
+    display:block;
+    font-size:11px;
+    opacity:.9;
+  }
 
-/* HEARTS */
-.heart{
-  position:fixed;
-  bottom:-20px;
-  font-size:26px;
-  animation:float 8s linear;
-}
-@keyframes float{
-  to{ transform:translateY(-110vh); opacity:0;}
-}
+  /* Flap */
+  .flap{
+    position:absolute;
+    left:0; right:0;
+    top:0;
+    margin:auto;
+    width:0;height:0;
+    border-left:170px solid transparent;
+    border-right:170px solid transparent;
+    border-top:120px solid var(--accent);
+    transform-origin:top;
+    cursor:pointer;
+  }
+  .front::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:12px;
+    border:2px solid rgba(0,0,0,.06);
+    pointer-events:none;
+  }
+
+  /* OVERLAY (click outside to close) */
+  .overlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    place-items:center;
+    padding:16px;
+    background:rgba(0,0,0,.28);
+  }
+
+  .letter-card{
+    width:min(92vw, var(--cardMax));
+    max-height:86vh;
+    overflow:auto;
+    background:white;
+    border-radius:18px;
+    box-shadow:0 22px 55px rgba(0,0,0,.24);
+    padding:16px 16px 22px;
+    position:relative;
+    min-height:var(--envelopeH);
+  }
+
+  .letter-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:8px;
+    border-bottom:1px solid rgba(0,0,0,.08);
+    margin-bottom:12px;
+  }
+
+  .letter-title{
+    font-weight:800;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .close{
+    width:42px;height:42px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    font-size:20px;
+    background:rgba(0,0,0,.06);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .close:hover{ background:rgba(0,0,0,.1); transform:translateY(-1px); }
+  .close:active{ transform:scale(.98); }
+
+  .photo{
+    width:100%;
+    border-radius:14px;
+    margin:10px 0 14px;
+  }
+
+  /* typing line */
+  .type{
+    font-size:22px;
+    font-weight:700;
+    border-right:3px solid rgba(255,77,109,.55);
+    overflow:hidden;
+    white-space:nowrap;
+    width:0;
+    animation:typing 2.6s steps(36,end) forwards;
+  }
+  @keyframes typing{ to{ width:100%; } }
+
+  /* Buttons */
+  .btn-row{
+    margin-top:18px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  button{
+    font-size:18px;
+    padding:12px 20px;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:800;
+  }
+
+  /* pill style */
+  .pill{
+    border-radius:999px;
+    letter-spacing:.5px;
+    transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    box-shadow:0 12px 24px rgba(0,0,0,.12);
+  }
+  .pill:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.02);
+    box-shadow:0 16px 30px rgba(0,0,0,.16);
+  }
+  .pill:active{ transform:translateY(0px) scale(.98); }
+
+  .yes{
+    background:var(--accent);
+    color:white;
+  }
+
+  .no{
+    background:#2f2f2f;
+    color:white;
+    position:relative; /* we move this around */
+  }
+
+  .response-card{
+    margin-top:16px;
+    display:none;
+    padding:14px 14px;
+    border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,214,231,.65), rgba(255,194,209,.45));
+    border:1px solid rgba(0,0,0,.06);
+    font-size:18px;
+    line-height:1.4;
+  }
+
+  /* HEARTS */
+  .heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:26px;
+    animation:float 8s linear;
+    pointer-events:none;
+  }
+  @keyframes float{
+    to{ transform:translateY(-110vh); opacity:0;}
+  }
 </style>
 </head>
 
 <body>
 
-<audio id="music" loop>
-<source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3">
+<!-- Music: keep loop + preload, and we "unlock" it on first click -->
+<audio id="music" loop preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3" type="audio/mpeg">
 </audio>
 
-<div class="mailbox" id="mailbox">
+<div class="mailbox" id="mailbox" aria-label="Mailbox">
   <div class="flag"></div>
   <div class="mail-slot"></div>
 </div>
 
-<div class="envelope" id="envelope">
-
+<div class="envelope" id="envelope" aria-label="Envelope">
   <!-- BACK -->
   <div class="face back">
     <div class="tofrom">
-      To Aaron 💕<br>
-      From Rizza 💖
+      To Aaron 💗<br>
+      From Rizza 🎀
     </div>
 
-    <img src="/mnt/data/A6557CED-4142-4432-9A0C-4FAC89CBEEA0.png" class="stamp">
+    <div class="stamp-wrap">
+      <!-- Replace with your real stamp image path -->
+      <img src="/mnt/data/A6557CED-4142-4432-9A0C-4FAC89CBEEA0.png" class="stamp-img" alt="Stamp">
 
-    <div class="postmark" id="stampDate"></div>
+      <div class="ink-stamp" id="inkStamp">
+        <span class="big">DELIVERED</span>
+        <span class="small" id="stampDate"></span>
+      </div>
+    </div>
   </div>
 
   <!-- FRONT -->
   <div class="face front">
-    <div class="flap" id="flap"></div>
+    <div class="flap" id="flap" title="Open"></div>
   </div>
 </div>
 
-<!-- LETTER -->
-<div class="letter" id="letter">
-  <div class="close" onclick="closeLetter()">✕</div>
+<!-- LETTER OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="letter-card" id="letterCard" role="dialog" aria-modal="true">
+    <div class="letter-header">
+      <div class="letter-title">💖 Special Note</div>
+      <button class="close" id="closeBtn" aria-label="Close">✕</button>
+    </div>
 
-  <img src="photo.jpeg" class="photo">
+    <!-- Replace with your real photo path -->
+    <img src="photo.jpeg" class="photo" alt="Photo">
 
-  <div class="type">
-    Will you be my Valentine? ❤️
+    <div class="type">Will you be my Valentine? 💕</div>
+
+    <div class="btn-row" style="margin-top:22px;">
+      <button class="yes pill" id="yesBtn">YES</button>
+      <button class="no pill" id="noBtn">NO</button>
+    </div>
+
+    <!-- second card for YES response -->
+    <div class="response-card" id="responseCard"></div>
   </div>
-
-  <div style="margin-top:40px;">
-    <button class="yes" id="yesBtn">YES PLEASE</button>
-    <button class="no" id="noBtn">NO THANK YOU</button>
-  </div>
-
-  <div id="responseText" style="font-size:28px;margin-top:30px;"></div>
 </div>
 
 <script>
-const mailbox=document.getElementById("mailbox");
-const envelope=document.getElementById("envelope");
-const flap=document.getElementById("flap");
-const letter=document.getElementById("letter");
-const music=document.getElementById("music");
-const yesBtn=document.getElementById("yesBtn");
-const noBtn=document.getElementById("noBtn");
-const responseText=document.getElementById("responseText");
+  const mailbox = document.getElementById("mailbox");
+  const envelope = document.getElementById("envelope");
+  const flap = document.getElementById("flap");
 
-let noClicks=0;
+  const overlay = document.getElementById("overlay");
+  const letterCard = document.getElementById("letterCard");
+  const closeBtn = document.getElementById("closeBtn");
 
-/* DATE STAMP */
-const today=new Date();
-document.getElementById("stampDate").innerText=
-`Cupid Post Office\n${today.toLocaleDateString()}`;
+  const music = document.getElementById("music");
 
-/* MAILBOX */
-mailbox.onclick=()=>{
-  mailbox.style.display="none";
-  envelope.style.display="block";
-};
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const responseCard = document.getElementById("responseCard");
+  const stampDate = document.getElementById("stampDate");
 
-/* FLIP */
-envelope.onclick=()=> envelope.classList.toggle("flip");
+  let noClicks = 0;
+  let heartsInterval = null;
+  let audioUnlocked = false;
 
-/* OPEN */
-flap.addEventListener("click",()=>{
-  letter.style.display="flex";
-});
+  /* DATE STAMP */
+  const today = new Date();
+  stampDate.innerText = today.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" });
 
-/* CLOSE */
-function closeLetter(){
-  letter.style.display="none";
-}
-
-/* YES */
-yesBtn.onclick=()=>{
-  music.play();
-  startHearts();
-  navigator.vibrate?.(200);
-
-  responseText.innerHTML=
-  "I love you! ♥️<br><br>I’m so glad you said yes because I wouldn’t have taken no as an answer.<br><br>See you on our valentines date this weekend!";
-};
-
-/* NO GAME */
-noBtn.onclick=()=>{
-  noClicks++;
-  if(noClicks<5){
-    noBtn.style.left=Math.random()*70+"%";
-    noBtn.style.top=Math.random()*70+"%";
-  }else{
-    noBtn.disabled=true;
-    noBtn.style.transition="1s";
-    noBtn.style.transform="translateY(-500px)";
+  /* AUDIO UNLOCK: browsers require a user gesture before play() works */
+  function unlockAudioOnce(){
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    music.muted = true;
+    const p = music.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
+        music.pause();
+        music.currentTime = 0;
+        music.muted = false;
+      }).catch(() => {
+        // If it fails here, it will still work when YES is clicked (user gesture).
+        music.muted = false;
+      });
+    } else {
+      music.muted = false;
+    }
   }
-};
 
-/* HEARTS */
-function startHearts(){
-  setInterval(()=>{
-    const h=document.createElement("div");
-    h.className="heart";
-    h.innerText="❤️";
-    h.style.left=Math.random()*100+"vw";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),8000);
-  },2500);
-}
+  window.addEventListener("pointerdown", unlockAudioOnce, { once:true });
+
+  /* MAILBOX -> ENVELOPE */
+  mailbox.addEventListener("click", () => {
+    mailbox.style.display = "none";
+    envelope.style.display = "block";
+  });
+
+  /* FLIP ENVELOPE (click envelope) */
+  envelope.addEventListener("click", (e) => {
+    // avoid envelope flip when clicking flap
+    if (e.target === flap) return;
+    envelope.classList.toggle("flip");
+  });
+
+  /* OPEN LETTER */
+  flap.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openLetter();
+  });
+
+  function openLetter(){
+    overlay.style.display = "grid";
+    // reset NO button position each open (optional)
+    noBtn.style.left = "0px";
+    noBtn.style.top = "0px";
+    noBtn.style.transform = "none";
+    noBtn.disabled = false;
+    noClicks = 0;
+
+    // hide response card on open
+    responseCard.style.display = "none";
+    responseCard.innerHTML = "";
+  }
+
+  /* CLOSE -> back to envelope */
+  function closeLetter(){
+    overlay.style.display = "none";
+  }
+
+  closeBtn.addEventListener("click", closeLetter);
+
+  /* click outside card closes */
+  overlay.addEventListener("click", () => closeLetter());
+  letterCard.addEventListener("click", (e) => e.stopPropagation());
+
+  /* YES */
+  yesBtn.addEventListener("click", async () => {
+    // show second card (not inline replacing the question)
+    responseCard.style.display = "block";
+    responseCard.innerHTML =
+      "Ahhh yay!! 💞<br><br>" +
+      "I love you!<br><br>" +
+      "See you on our Valentine’s date this weekend 💗";
+
+    try{
+      await music.play();
+    }catch(err){
+      // If autoplay policy blocks, user can tap again; but this should work since it's a click.
+      console.warn("Music play blocked:", err);
+    }
+
+    startHearts();
+    navigator.vibrate?.(200);
+  });
+
+  /* NO GAME */
+  noBtn.addEventListener("click", () => {
+    noClicks++;
+
+    if (noClicks <= 5){
+      // Move within the visible card area
+      const cardRect = letterCard.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = Math.max(0, cardRect.width - btnRect.width - 24);
+      const maxY = Math.max(0, cardRect.height - btnRect.height - 24);
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      // Use translate so layout doesn't jump
+      noBtn.style.position = "absolute";
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    } else {
+      // 6th click: fly away + disappear
+      noBtn.disabled = true;
+      noBtn.style.transition = "transform .8s ease, opacity .8s ease";
+      noBtn.style.transform = "translateY(-500px) rotate(-18deg)";
+      noBtn.style.opacity = "0";
+      setTimeout(() => noBtn.style.display = "none", 850);
+    }
+  });
+
+  /* HEARTS */
+  function startHearts(){
+    if (heartsInterval) return; // don't start multiple
+
+    heartsInterval = setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      // cuter girly emojis
+      h.innerText = ["💖","💗","💞","🎀","✨","🌸"][Math.floor(Math.random()*6)];
+      h.style.left = Math.random() * 100 + "vw";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 8000);
+    }, 800);
+  }
 </script>
 
 </body>
