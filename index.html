@@ -243,10 +243,26 @@ body{
   86%{transform:translateY(-5px);}
   94%{transform:translateY(-3px);}
 }
+
+/* ✅ floating hearts (light amount) */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  font-size:22px;
+  animation:float 7.5s linear;
+  pointer-events:none;
+  z-index:9998;
+}
+@keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
 </style>
 </head>
 
 <body>
+
+<!-- ✅ Piano music (Pixabay CDN) -->
+<audio id="piano" preload="auto" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
+</audio>
 
 <div class="mailbox" id="mailbox">
   <div class="flag-pole"></div>
@@ -338,6 +354,39 @@ const overlayResponse = document.getElementById("overlayResponse");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 
+/* ✅ piano audio */
+const piano = document.getElementById("piano");
+
+/* ✅ hearts (light amount) */
+let heartsInterval = null;
+let activeHearts = 0;
+const MAX_HEARTS_ON_SCREEN = 10;
+
+function startHearts(){
+  if (heartsInterval) return;
+  heartsInterval = setInterval(() => {
+    if (activeHearts >= MAX_HEARTS_ON_SCREEN) return;
+
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerText = ["💖","💗","💞","🎀","✨","🌸"][Math.floor(Math.random()*6)];
+    h.style.left = (Math.random() * 100) + "vw";
+    document.body.appendChild(h);
+    activeHearts++;
+
+    setTimeout(() => {
+      h.remove();
+      activeHearts = Math.max(0, activeHearts - 1);
+    }, 7500);
+  }, 1400); // slower = fewer hearts
+}
+
+function stopHearts(){
+  if (!heartsInterval) return;
+  clearInterval(heartsInterval);
+  heartsInterval = null;
+}
+
 document.getElementById("deliveryDate").textContent =
   new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
 
@@ -366,7 +415,7 @@ flap.onclick = (e) => {
   setTimeout(() => overlayLetter.classList.add("show"), 300);
 };
 
-/* ✅ restore NO teleport behavior (this was missing) */
+/* NO teleport behavior */
 let noClicks = 0;
 
 function resetNoButton(){
@@ -385,7 +434,6 @@ function resetNoButton(){
 noBtn.onclick = () => {
   noClicks++;
 
-  // fixed so it NEVER affects layout
   noBtn.style.position = "fixed";
   noBtn.style.zIndex = "9999";
 
@@ -419,15 +467,31 @@ document.getElementById("closeResponse").onclick = () => {
   flap.classList.remove("opened");
   showFront();
   resetNoButton();
+  stopHearts();
 
   mailbox.style.display = "block";
   envelopeScene.style.display = "none";
   mailbox.classList.remove("opening");
+
+  // optional: reset audio position when closing
+  try{ piano.pause(); piano.currentTime = 0; }catch(e){}
 };
 
-yesBtn.onclick = () => {
+/* ✅ YES: play piano + hearts + open response (only on YES click) */
+yesBtn.onclick = async () => {
   overlayLetter.classList.remove("show");
   overlayResponse.classList.add("show");
+
+  try{
+    piano.volume = 0.35;
+    piano.currentTime = 0;
+    await piano.play();
+  }catch(e){
+    // If Chrome blocks for any reason, user can tap again; but YES is a gesture so it usually works.
+    console.log("Audio play blocked:", e);
+  }
+
+  startHearts();
 };
 </script>
 
