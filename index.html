@@ -6,8 +6,9 @@
 <title>Special Delivery 💌</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💌</text></svg>">
 
+<!-- 💌 Cute Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>">
 
 <style>
 :root{
@@ -56,7 +57,6 @@ body{
   right:-18px;top:20px;
   width:10px;height:70px;
   background:#fff;border-radius:6px;
-  box-shadow:0 10px 18px rgba(0,0,0,.14);
 }
 .flag-triangle{
   position:absolute;
@@ -65,7 +65,6 @@ body{
   border-top:12px solid transparent;
   border-bottom:12px solid transparent;
   border-left:26px solid #fff;
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,.18));
 }
 .mail-slot{
   width:120px;height:20px;background:#333;
@@ -177,8 +176,6 @@ body{
   flex:1;
   padding-right:14px;
   margin-right:-8px;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
 }
 
 /* HEADERS */
@@ -230,7 +227,7 @@ body{
   min-height:64px;
 }
 
-/* Cutesy pill shape - NO SHADOW */
+/* Pills (no shadow) */
 .pill{
   font-family:'Quicksand',sans-serif;
   font-size:18px;
@@ -270,19 +267,6 @@ body{
   opacity:0.9;
 }
 @keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
-
-/* Hidden scrollbar until hover */
-.card-body::-webkit-scrollbar{ width:6px; }
-.card-body::-webkit-scrollbar-track{ background:transparent; }
-.card-body::-webkit-scrollbar-thumb{
-  background:transparent;
-  border-radius:20px;
-  border:2px solid transparent;
-}
-.card-body:hover::-webkit-scrollbar-thumb{
-  background:#ffb6c7;
-  border:2px solid #ffb6c7;
-}
 </style>
 </head>
 
