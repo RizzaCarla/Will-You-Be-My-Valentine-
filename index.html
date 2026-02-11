@@ -269,22 +269,44 @@ body{
 }
 @keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
 
-  /* Cute Scrollbar (only inside letter content) */
+/* Base scroll area */
+.card-body{
+  overflow:auto;
+  flex:1;
+  padding-right:6px;
+
+  scrollbar-width: thin;          /* Firefox */
+  scrollbar-color: transparent transparent;
+}
+
+/* Hide scrollbar by default (Chrome) */
 .card-body::-webkit-scrollbar{
-  width:10px;
+  width:6px;
 }
+
 .card-body::-webkit-scrollbar-track{
-  background:rgba(255,255,255,0.6);
-  border-radius:20px;
+  background:transparent;
 }
+
 .card-body::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,#ff8fc1,#ff4d6d);
+  background:transparent;
   border-radius:20px;
-  border:2px solid rgba(255,255,255,0.6);
+  border:2px solid transparent;
+  transition:opacity .25s ease;
 }
-.card-body::-webkit-scrollbar-thumb:hover{
-  background:linear-gradient(180deg,#ff6aa8,#ff355c);
+
+/* Show scrollbar only on hover (Chrome) */
+.card-body:hover::-webkit-scrollbar-thumb{
+  background:#ffb6c7;              /* light pink */
+  border:2px solid #ffb6c7;        /* same color border */
+  border-radius:20px;
 }
+
+/* Firefox: show only on hover */
+.card-body:hover{
+  scrollbar-color:#ffb6c7 transparent;
+}
+
 
 </style>
 </head>
