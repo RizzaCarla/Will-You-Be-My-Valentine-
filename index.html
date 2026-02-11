@@ -298,6 +298,43 @@ body{
   background:linear-gradient(180deg,#ff6aa8,#ff355c);
 }
 
+/* Base scroll area */
+.card-body{
+  overflow:auto;
+  flex:1;
+  padding-right:6px;
+
+  scrollbar-width: thin;          /* Firefox */
+  scrollbar-color: transparent transparent;
+}
+
+/* Hide scrollbar by default (Chrome) */
+.card-body::-webkit-scrollbar{
+  width:6px;
+}
+
+.card-body::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.card-body::-webkit-scrollbar-thumb{
+  background:transparent;
+  border-radius:20px;
+  border:2px solid transparent;
+  transition:opacity .25s ease;
+}
+
+/* Show scrollbar only on hover (Chrome) */
+.card-body:hover::-webkit-scrollbar-thumb{
+  background:#ffb6c7;              /* light pink */
+  border:2px solid #ffb6c7;        /* same color border */
+  border-radius:20px;
+}
+
+/* Firefox: show only on hover */
+.card-body:hover{
+  scrollbar-color:#ffb6c7 transparent;
+}
 
 </style>
 </head>
