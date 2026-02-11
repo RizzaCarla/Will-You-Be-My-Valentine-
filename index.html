@@ -29,6 +29,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
+  user-select:none;
 }
 
 /* ---------------- MAILBOX ---------------- */
@@ -39,7 +40,8 @@ body{
   position:relative;
   cursor:pointer;
   box-shadow:0 18px 35px rgba(0,0,0,.18);
-  transition:.35s ease;
+  transition:transform .35s ease, opacity .35s ease;
+  overflow:visible;
 }
 .mailbox.opening{
   transform:scale(.92) translateY(6px);
@@ -52,17 +54,20 @@ body{
   right:-18px;top:20px;
   width:10px;height:70px;
   background:#fff;border-radius:6px;
+  box-shadow:0 10px 18px rgba(0,0,0,.14);
 }
 .flag-triangle{
   position:absolute;
   right:-44px;top:28px;
+  width:0;height:0;
   border-top:12px solid transparent;
   border-bottom:12px solid transparent;
   border-left:26px solid #fff;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.18));
 }
 .mail-slot{
   width:120px;height:20px;background:#333;
-  position:absolute;top:70px;left:40px;border-radius:10px;
+  position:absolute;top:70px;left:40px;border-radius:10px;opacity:.9;
 }
 
 /* ---------------- ENVELOPE ---------------- */
@@ -76,7 +81,7 @@ body{
   width:100%;height:100%;
   position:relative;
   transform-style:preserve-3d;
-  transition:.8s cubic-bezier(.2,.9,.2,1);
+  transition:transform .85s cubic-bezier(.2,.9,.2,1);
   border-radius:12px;
   box-shadow:0 18px 40px rgba(0,0,0,.18);
   cursor:pointer;
@@ -87,6 +92,7 @@ body{
 .face{
   position:absolute;inset:0;
   backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
   border-radius:12px;
   overflow:hidden;
   background:#fff;
@@ -98,6 +104,8 @@ body{
   position:absolute;
   top:16px;left:16px;
   font-weight:800;font-size:18px;
+  line-height:1.25;
+  color:#1f1f1f;
 }
 
 .stamp-area{
@@ -138,7 +146,8 @@ body{
   border-right:170px solid transparent;
   border-top:120px solid var(--accent);
   transform-origin:top;
-  transition:.6s ease;
+  transition:transform .6s ease;
+  z-index:2;
 }
 .flap.opened{transform:rotateX(160deg);}
 
@@ -180,13 +189,17 @@ body{
   background:rgba(0,0,0,.06);
   cursor:pointer;
   font-size:20px;
+  transition:transform .15s ease, background .15s ease;
 }
+.close:hover{ background:rgba(0,0,0,.10); transform:translateY(-1px); }
+.close:active{ transform:scale(.98); }
 
 .photo{
   width:100%;
   height:auto;
   border-radius:14px;
   margin:10px 0 14px;
+  display:block;
 }
 
 .type{
@@ -205,12 +218,12 @@ body{
   min-height:64px;
 }
 
-/* ---- PILL DESIGN (font restored, thinner height kept) ---- */
+/* ---- PILL DESIGN (SHORTER HEIGHT, WIDE SIDES) ---- */
 .pill{
   font-family:'Quicksand',sans-serif;
-  font-size:18px;            /* restored */
+  font-size:18px;            /* keep */
   font-weight:800;
-  padding:8px 18px;          /* thinner height */
+  padding:6px 22px;          /* CHANGED: thinner top/bottom, wider left/right */
   border:none;
   border-radius:999px;
   cursor:pointer;
@@ -220,7 +233,7 @@ body{
   box-shadow:0 12px 24px rgba(0,0,0,.12);
   position:relative;
   z-index:3;
-  line-height:1;
+  line-height:1;             /* keeps it compact */
 }
 .pill:hover{
   transform:translateY(-2px);
@@ -233,9 +246,10 @@ body{
 .no{
   background:#2f2f2f;
   color:#fff;
-  z-index:10;                /* ADDED: ensures it never sits under image */
+  z-index:10; /* stays above */
 }
 
+/* YES tiny jump */
 .yes.boop{animation:yesBoop 2.4s ease-in-out infinite;}
 @keyframes yesBoop{
   0%,82%,100%{transform:translateY(0);}
@@ -243,14 +257,242 @@ body{
   94%{transform:translateY(-3px);}
 }
 
+/* Floating hearts */
 .heart{
-  position:fixed;bottom:-20px;
+  position:fixed;
+  bottom:-20px;
   font-size:26px;
   animation:float 7.5s linear;
+  pointer-events:none;
 }
 @keyframes float{to{transform:translateY(-110vh);opacity:0;}}
 </style>
 </head>
 
 <body>
-<!-- (HTML + JS below unchanged from your previous working version) -->
+
+<div class="mailbox" id="mailbox" aria-label="Mailbox">
+  <div class="flag-pole"></div>
+  <div class="flag-triangle"></div>
+  <div class="mail-slot"></div>
+</div>
+
+<div class="envelope-scene" id="envelopeScene" aria-label="Envelope Scene">
+  <div class="envelope-card showBack" id="envelopeCard" aria-label="Envelope">
+
+    <!-- BACK -->
+    <div class="face back">
+      <div class="tofrom">
+        To Aaron 💘<br>
+        From Rizza 🎀
+      </div>
+
+      <div class="stamp-area">
+        <!-- Simple heart stamp -->
+        <svg class="forever-stamp" viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg" aria-label="Heart stamp">
+          <rect x="12" y="12" width="196" height="256" rx="14" fill="#b0192b"/>
+          <path d="M110 140
+                   C110 110,150 110,150 140
+                   C150 165,110 190,110 190
+                   C110 190,70 165,70 140
+                   C70 110,110 110,110 140 Z"
+                fill="#fff"/>
+        </svg>
+
+        <div class="delivery-stamp" aria-label="Delivery stamp">
+          <div>SPECIAL DELIVERY</div>
+          <div>CUPID POST OFFICE</div>
+          <div id="deliveryDate"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRONT -->
+    <div class="face front">
+      <div class="flap" id="flap" title="Open"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FIRST LETTER -->
+<div class="overlay" id="overlayLetter">
+  <div class="card" id="letterCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Special Note</div>
+      <button class="close" id="closeLetter" aria-label="Close">✕</button>
+    </div>
+
+    <img src="photo.jpeg" class="photo" alt="Photo 1">
+    <div class="type">Will you be my Valentine?</div>
+
+    <div class="btn-row">
+      <button class="pill yes boop" id="yesBtn">yes</button>
+      <button class="pill no" id="noBtn">no</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESPONSE -->
+<div class="overlay" id="overlayResponse">
+  <div class="card" id="responseCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Message</div>
+      <button class="close" id="closeResponse" aria-label="Close">✕</button>
+    </div>
+
+    <img src="photo2.jpeg" class="photo" alt="Photo 2">
+
+    <div style="font-size:18px;line-height:1.5;font-weight:700;">
+      I love you ♥️ Thank you for being my valentine.<br><br>
+      I cant wait for our hiking date this weekend.<br><br>
+      PS. I wouldn’t have taken no for an answer.
+    </div>
+  </div>
+</div>
+
+<script>
+  const mailbox = document.getElementById("mailbox");
+  const envelopeScene = document.getElementById("envelopeScene");
+  const envelopeCard = document.getElementById("envelopeCard");
+  const flap = document.getElementById("flap");
+
+  const overlayLetter = document.getElementById("overlayLetter");
+  const overlayResponse = document.getElementById("overlayResponse");
+
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+
+  document.getElementById("deliveryDate").textContent =
+    new Date().toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
+
+  function showBack(){
+    envelopeCard.classList.add("showBack");
+    envelopeCard.classList.remove("showFront");
+  }
+  function showFront(){
+    envelopeCard.classList.add("showFront");
+    envelopeCard.classList.remove("showBack");
+  }
+
+  /* MAILBOX -> ENVELOPE (back first) */
+  mailbox.onclick = () => {
+    mailbox.classList.add("opening");
+    setTimeout(() => {
+      mailbox.style.display = "none";
+      envelopeScene.style.display = "block";
+      showBack();
+    }, 300);
+  };
+
+  /* click envelope to flip (except flap) */
+  envelopeCard.onclick = (e) => {
+    if (e.target === flap) return;
+    if (envelopeCard.classList.contains("showBack")) showFront();
+    else showBack();
+  };
+
+  /* flap opens letter from front only */
+  flap.onclick = (e) => {
+    e.stopPropagation();
+    if (envelopeCard.classList.contains("showBack")) { showFront(); return; }
+    flap.classList.add("opened");
+    setTimeout(() => overlayLetter.classList.add("show"), 300);
+  };
+
+  /* Hearts */
+  let heartsInterval = null;
+
+  function startHearts(){
+    if (heartsInterval) return;
+    heartsInterval = setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.innerText = ["💖","💗","💞","✨"][Math.floor(Math.random()*4)];
+      h.style.left = Math.random() * 100 + "vw";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 7500);
+    }, 700);
+  }
+  function stopHearts(){
+    if (!heartsInterval) return;
+    clearInterval(heartsInterval);
+    heartsInterval = null;
+  }
+
+  /* Reset (repeatable) */
+  let noClicks = 0;
+
+  function resetNoButton(){
+    noClicks = 0;
+    noBtn.disabled = false;
+    noBtn.style.display = "inline-block";
+    noBtn.style.opacity = "1";
+    noBtn.style.transition = "";
+    noBtn.style.position = "relative";
+    noBtn.style.left = "0";
+    noBtn.style.top = "0";
+    noBtn.style.transform = "scale(1)";
+    noBtn.style.zIndex = "10";
+  }
+
+  function resetExperience(){
+    flap.classList.remove("opened");
+    showFront();          // ensure flap is visible again
+    resetNoButton();
+    stopHearts();
+  }
+
+  document.getElementById("closeLetter").onclick = () => {
+    overlayLetter.classList.remove("show");
+    resetExperience();
+  };
+
+  document.getElementById("closeResponse").onclick = () => {
+    overlayResponse.classList.remove("show");
+    resetExperience();
+
+    // reset full flow back to mailbox
+    mailbox.style.display = "block";
+    envelopeScene.style.display = "none";
+    mailbox.classList.remove("opening");
+  };
+
+  /* YES -> response + hearts */
+  yesBtn.onclick = () => {
+    overlayLetter.classList.remove("show");
+    overlayResponse.classList.add("show");
+    startHearts();
+  };
+
+  /* NO -> TRUE CHAOS: teleport anywhere on screen */
+  noBtn.onclick = () => {
+    noClicks++;
+
+    // fixed so it never affects layout or card size
+    noBtn.style.position = "fixed";
+    noBtn.style.zIndex = "9999";
+
+    const scale = Math.max(0.55, 1 - (noClicks * 0.16));
+    noBtn.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+    if (noClicks <= 3) {
+      const pad = 20;
+      const x = Math.random() * (window.innerWidth  - pad * 2) + pad;
+      const y = Math.random() * (window.innerHeight - pad * 2) + pad;
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    } else {
+      // 4th click: fly away
+      noBtn.disabled = true;
+      noBtn.style.transition = "transform .8s ease, opacity .8s ease";
+      noBtn.style.transform = `translate(-50%, -50%) translateY(-600px) scale(${scale})`;
+      noBtn.style.opacity = "0";
+      setTimeout(() => noBtn.style.display = "none", 800);
+    }
+  };
+</script>
+
+</body>
+</html>
