@@ -1,386 +1,654 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Special Delivery 💌</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --pink1:#ffd6e7;
-  --pink2:#ffc2d1;
-  --accent:#ff4d6d;
-  --deliveryRed:#8f1023;
-  --envelopeW:340px;
-  --envelopeH:230px;
-}
+  :root{
+    --pink1:#ffd6e7;
+    --pink2:#ffc2d1;
+    --accent:#ff4d6d;
+    --deliveryRed:#8f1023;
 
-*{box-sizing:border-box;}
+    --envelopeW:340px;
+    --envelopeH:230px;
 
-body{
-  margin:0;
-  font-family:'Quicksand',sans-serif;
-  background:linear-gradient(135deg,var(--pink1),var(--pink2));
-  height:100vh;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+    --cardMax:560px;
+    --cardMinH:230px;
+  }
 
-/* ---------------- MAILBOX ---------------- */
-.mailbox{
-  width:200px;height:160px;
-  background:var(--accent);
-  border-radius:20px;
-  position:relative;
-  cursor:pointer;
-  box-shadow:0 18px 35px rgba(0,0,0,.18);
-  transition:.35s ease;
-}
-.mailbox.opening{transform:scale(.9);opacity:0;}
+  *{ box-sizing:border-box; }
 
-.flag-pole{
-  position:absolute;right:-18px;top:20px;
-  width:10px;height:70px;background:#fff;border-radius:6px;
-}
-.flag-triangle{
-  position:absolute;right:-44px;top:28px;
-  border-top:12px solid transparent;
-  border-bottom:12px solid transparent;
-  border-left:26px solid #fff;
-}
-.mail-slot{
-  width:120px;height:20px;background:#333;
-  position:absolute;top:70px;left:40px;border-radius:10px;
-}
+  body{
+    margin:0;
+    font-family:'Quicksand', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,var(--pink1),var(--pink2));
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    user-select:none;
+  }
 
-/* ---------------- ENVELOPE ---------------- */
-.envelope-scene{
-  display:none;
-  width:var(--envelopeW);
-  height:var(--envelopeH);
-  perspective:1200px;
-}
+  /* ---------- MAILBOX ---------- */
+  .mailbox{
+    width:200px;height:160px;
+    background:var(--accent);
+    border-radius:20px;
+    position:relative;
+    cursor:pointer;
+    box-shadow:0 18px 35px rgba(0,0,0,.18);
+    transition:transform .35s ease, opacity .35s ease;
+    overflow:visible;
+  }
+  .mailbox.opening{
+    transform:scale(.92) translateY(6px);
+    opacity:0;
+    pointer-events:none;
+  }
 
-.envelope-card{
-  width:100%;height:100%;
-  position:relative;
-  transform-style:preserve-3d;
-  transition:transform .8s cubic-bezier(.2,.9,.2,1);
-  border-radius:12px;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  cursor:grab;
-}
+  .flag-pole{
+    position:absolute;
+    right:-18px;
+    top:20px;
+    width:10px;
+    height:70px;
+    background:#fff;
+    border-radius:6px;
+    box-shadow:0 10px 18px rgba(0,0,0,.14);
+  }
+  .flag-triangle{
+    position:absolute;
+    right:-44px;
+    top:28px;
+    width:0;height:0;
+    border-top:12px solid transparent;
+    border-bottom:12px solid transparent;
+    border-left:26px solid #fff;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.18));
+  }
+  .mail-slot{
+    width:120px;height:20px;background:#333;
+    position:absolute;top:70px;left:40px;border-radius:10px;opacity:.9;
+  }
 
-.envelope-card.showBack{ transform:rotateY(0deg); }
-.envelope-card.showFront{ transform:rotateY(180deg); }
+  /* ---------- ENVELOPE 3D (separate faces, no combining) ---------- */
+  .envelope-scene{
+    display:none;
+    width:var(--envelopeW);
+    height:var(--envelopeH);
+    perspective:1200px;
+  }
 
-.face{
-  position:absolute;
-  inset:0;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  border-radius:12px;
-  overflow:hidden;
-}
+  .envelope-card{
+    width:100%;
+    height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform 900ms cubic-bezier(.2,.9,.2,1.1);
+    border-radius:12px;
+    box-shadow:0 18px 40px rgba(0,0,0,.18);
+    cursor:grab;
+    animation:popInCard .45s ease both;
+    will-change:transform;
+  }
+  .envelope-card:active{ cursor:grabbing; }
 
-/* BACK first */
-.back{
-  background:#fff;
-  transform:rotateY(0deg);
-  padding:18px;
-}
+  @keyframes popInCard{
+    from{ transform:scale(.9) rotateY(0deg); opacity:0; }
+    to{ transform:scale(1) rotateY(0deg); opacity:1; }
+  }
 
-/* FRONT */
-.front{
-  background:#fff;
-  transform:rotateY(180deg);
-}
+  /* BACK first */
+  .envelope-card.showBack{ transform:rotateY(0deg); }
+  /* FRONT after flip */
+  .envelope-card.showFront{ transform:rotateY(180deg); }
 
-/* Back content */
-.tofrom{
-  font-weight:800;
-  font-size:18px;
-  line-height:1.3;
-}
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    transform-style:preserve-3d;
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+  }
 
-.stamp-area{
-  position:absolute;
-  top:12px;
-  right:12px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  align-items:flex-end;
-}
+  /* Back visible first */
+  .back{ transform:rotateY(0deg); }
 
-/* Cute Valentine Stamp */
-.forever-stamp{
-  width:118px;
-  height:148px;
-}
+  /* Front appears after flip */
+  .front{ transform:rotateY(180deg); }
 
-.delivery-stamp{
-  padding:10px 16px;
-  border:4px solid var(--deliveryRed);
-  color:var(--deliveryRed);
-  font-weight:800;
-  font-size:13px;
-  transform:rotate(-6deg);
-  text-align:center;
-}
+  /* BACK CONTENT */
+  .tofrom{
+    position:absolute;
+    top:16px;
+    left:16px;
+    font-size:18px;
+    line-height:1.25;
+    font-weight:800;
+    color:#1f1f1f;
+  }
 
-/* Flap */
-.flap{
-  position:absolute;
-  left:0;right:0;top:0;margin:auto;
-  border-left:170px solid transparent;
-  border-right:170px solid transparent;
-  border-top:120px solid var(--accent);
-  transform-origin:top;
-  transition:transform .6s ease;
-}
-.flap.opened{ transform:rotateX(160deg); }
+  /* Stamp column on back: no overlap */
+  .stamp-area{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:132px;
+    height:210px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:10px;
+  }
 
-/* ---------------- LETTER ---------------- */
-.overlay{
-  position:fixed;
-  inset:0;
-  display:none;
-  place-items:center;
-  background:rgba(0,0,0,.15);
-}
-.overlay.show{display:grid;}
+  /* Cute Love Birds stamp */
+  .forever-stamp{
+    width:118px;
+    height:148px;
+    filter:drop-shadow(0 10px 16px rgba(0,0,0,.18));
+    transform:none; /* straight */
+  }
 
-.card{
-  width:90vw;
-  max-width:560px;
-  background:#fff;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 22px 55px rgba(0,0,0,.25);
-  max-height:80vh;
-  overflow:auto;
-  position:relative;
-}
+  /* Delivery stamp: dark red, separate, text confined */
+  .delivery-stamp{
+    width:132px;
+    height:52px;
+    border:3px solid var(--deliveryRed);
+    border-radius:12px;
+    color:var(--deliveryRed);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6px 8px;
+    font-weight:800;
+    line-height:1.05;
+    background:rgba(143,16,35,.05);
+    box-shadow:0 10px 16px rgba(0,0,0,.12);
+    overflow:hidden; /* confines text */
+  }
+  .delivery-stamp .line1{ font-size:13px; letter-spacing:.6px; }
+  .delivery-stamp .line2{ font-size:11px; opacity:.95; }
+  .delivery-stamp .line3{ font-size:10px; opacity:.9; }
 
-.close{
-  position:absolute;
-  top:12px;right:12px;
-  border:none;background:#eee;
-  width:40px;height:40px;
-  border-radius:10px;
-  cursor:pointer;
-}
+  /* FRONT flap */
+  .flap{
+    position:absolute;
+    left:0; right:0;
+    top:0;
+    margin:auto;
+    width:0;height:0;
+    border-left:170px solid transparent;
+    border-right:170px solid transparent;
+    border-top:120px solid var(--accent);
+    transform-origin:top;
+    cursor:pointer;
+    transition:transform .6s cubic-bezier(.2,.9,.2,1);
+    z-index:2;
+  }
+  .flap.opened{ transform:rotateX(160deg); }
+  .front::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:12px;
+    border:2px solid rgba(0,0,0,.06);
+    pointer-events:none;
+  }
 
-.photo{
-  width:100%;
-  border-radius:14px;
-  margin:10px 0;
-}
+  /* ---------- OVERLAYS / LETTERS ---------- */
+  .overlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    place-items:center;
+    padding:22px;
+    background:rgba(0,0,0,.16);
+  }
+  .overlay.show{ display:grid; }
 
-.type{
-  font-size:22px;
-  font-weight:800;
-  border-right:3px solid var(--accent);
-  white-space:nowrap;
-  overflow:hidden;
-  width:0;
-  animation:typing 2s steps(32,end) forwards;
-}
-@keyframes typing{to{width:100%;}}
+  .card{
+    width:min(92vw, var(--cardMax));
+    max-height:82vh;           /* scroll if needed */
+    overflow:auto;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 22px 55px rgba(0,0,0,.24);
+    padding:16px 16px 22px;
+    min-height:var(--cardMinH);
+    position:relative;
+  }
 
-.btn-row{margin-top:16px;display:flex;gap:12px;}
+  .card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:8px;
+    border-bottom:1px solid rgba(0,0,0,.08);
+    margin-bottom:12px;
+  }
+  .card-title{ font-weight:800; font-size:18px; }
 
-.pill{
-  border:none;
-  border-radius:999px;
-  padding:12px 22px;
-  font-weight:800;
-  cursor:pointer;
-}
+  .close{
+    width:42px;height:42px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    font-size:20px;
+    background:rgba(0,0,0,.06);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .close:hover{ background:rgba(0,0,0,.10); transform:translateY(-1px); }
+  .close:active{ transform:scale(.98); }
 
-.yes{background:var(--accent);color:#fff;}
-.no{background:#333;color:#fff;}
+  /* Photo: full natural height */
+  .photo{
+    width:100%;
+    height:auto;        /* ✅ natural height */
+    display:block;
+    border-radius:14px;
+    margin:10px 0 14px;
+  }
 
-.heart{
-  position:fixed;
-  bottom:-20px;
-  font-size:26px;
-  animation:float 7s linear;
-}
-@keyframes float{to{transform:translateY(-110vh);opacity:0;}}
+  .type{
+    font-size:22px;
+    font-weight:800;
+    border-right:3px solid rgba(255,77,109,.55);
+    overflow:hidden;
+    white-space:nowrap;
+    width:0;
+    animation:typing 2.2s steps(34,end) forwards;
+  }
+  @keyframes typing{ to{ width:100%; } }
+
+  .btn-row{
+    margin-top:18px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    position:relative;
+    min-height:64px;
+  }
+
+  .pill{
+    font-family:'Quicksand', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size:18px;
+    font-weight:800;
+    padding:12px 22px;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    letter-spacing:.3px;
+    text-transform:lowercase;
+    transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    box-shadow:0 12px 24px rgba(0,0,0,.12);
+    position:relative;
+  }
+  .pill:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.02);
+    box-shadow:0 16px 30px rgba(0,0,0,.16);
+  }
+  .pill:active{ transform:translateY(0px) scale(.98); }
+
+  .yes{ background:var(--accent); color:#fff; }
+  .no{ background:#2f2f2f; color:#fff; }
+
+  /* YES tiny jump every couple seconds */
+  .yes.boop{ animation:yesBoop 2.4s ease-in-out infinite; }
+  @keyframes yesBoop{
+    0%, 82%, 100% { transform:translateY(0); }
+    86% { transform:translateY(-5px); }
+    90% { transform:translateY(0); }
+    94% { transform:translateY(-3px); }
+    98% { transform:translateY(0); }
+  }
+
+  .response-text{
+    font-size:18px;
+    line-height:1.5;
+    font-weight:700;
+  }
+
+  /* Floating hearts */
+  .heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:26px;
+    animation:float 7.5s linear;
+    pointer-events:none;
+  }
+  @keyframes float{ to{ transform:translateY(-110vh); opacity:0;} }
 </style>
 </head>
 
 <body>
 
-<div class="mailbox" id="mailbox">
+<div class="mailbox" id="mailbox" aria-label="Mailbox">
   <div class="flag-pole"></div>
   <div class="flag-triangle"></div>
   <div class="mail-slot"></div>
 </div>
 
-<div class="envelope-scene" id="envelopeScene">
-  <div class="envelope-card showBack" id="envelopeCard">
+<!-- ENVELOPE SCENE -->
+<div class="envelope-scene" id="envelopeScene" aria-label="Envelope Scene">
+  <div class="envelope-card showBack" id="envelopeCard" aria-label="Envelope">
 
+    <!-- BACK (shows first) -->
     <div class="face back">
       <div class="tofrom">
-        To Aaron 💘<br>From Rizza 🎀
+        To Aaron 💘🕊️<br>
+        From Rizza 🎀💖
       </div>
 
       <div class="stamp-area">
-
-        <!-- Cute Valentine SVG Stamp -->
-        <svg class="forever-stamp" viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cute love birds stamp -->
+        <svg class="forever-stamp" viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg" aria-label="Forever stamp">
           <defs>
-            <linearGradient id="valBg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ff5c8a"/>
-              <stop offset="100%" stop-color="#b0192b"/>
+            <filter id="softBird" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="rgba(0,0,0,.15)"/>
+            </filter>
+            <linearGradient id="bgBird" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff4d8a"/>
+              <stop offset="1" stop-color="#b0192b"/>
             </linearGradient>
           </defs>
 
-          <rect x="10" y="10" width="200" height="260" rx="16"
-                fill="url(#valBg)" stroke="#fff" stroke-width="6"
-                stroke-dasharray="4 10"/>
+          <rect x="12" y="12" width="196" height="256" rx="12" fill="url(#bgBird)" filter="url(#softBird)"/>
+          <rect x="16" y="16" width="188" height="248" rx="10"
+                fill="none" stroke="#ffffff" stroke-opacity=".55"
+                stroke-width="6" stroke-dasharray="2 12"/>
 
-          <text x="110" y="45" text-anchor="middle"
-                fill="#fff" font-size="24" font-weight="800">
-            us forever
-          </text>
+          <text x="28" y="55" fill="#ffffff" font-size="24" font-weight="800"
+                font-family="Quicksand, Arial, sans-serif">love birds</text>
 
-          <path d="M110 120
-                   C110 95, 150 95, 150 120
-                   C150 145, 110 170, 110 170
-                   C110 170, 70 145, 70 120
-                   C70 95, 110 95, 110 120 Z"
-                fill="#fff"/>
+          <!-- birds on a branch + heart -->
+          <g transform="translate(22,78)">
+            <!-- branch -->
+            <path d="M10 150 C60 120, 120 120, 176 140"
+                  stroke="#ffd1dc" stroke-width="10" stroke-linecap="round" fill="none" opacity=".95"/>
 
-          <rect x="70" y="180" width="100" height="55"
-                rx="10" fill="#ffb6c7"/>
-          <path d="M70 185 L120 215 L170 185"
-                fill="none" stroke="#fff" stroke-width="4"/>
+            <!-- left bird -->
+            <g transform="translate(35,90)">
+              <ellipse cx="30" cy="40" rx="30" ry="26" fill="#fff" opacity=".95"/>
+              <circle cx="44" cy="34" r="3" fill="#b0192b" opacity=".8"/>
+              <path d="M54 40 L70 46 L54 52 Z" fill="#ffd1dc"/>
+              <path d="M24 54 C30 40, 40 32, 52 28" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".95"/>
+              <path d="M12 52 C18 66, 34 74, 50 70" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".95"/>
+            </g>
 
-          <text x="110" y="255" text-anchor="middle"
-                fill="#fff" font-size="18" font-weight="700">
-            forever
-          </text>
+            <!-- right bird -->
+            <g transform="translate(112,88)">
+              <ellipse cx="30" cy="40" rx="30" ry="26" fill="#fff" opacity=".95"/>
+              <circle cx="16" cy="34" r="3" fill="#b0192b" opacity=".8"/>
+              <path d="M6 40 L-10 46 L6 52 Z" fill="#ffd1dc"/>
+              <path d="M36 54 C30 40, 20 32, 8 28" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".95"/>
+              <path d="M48 52 C42 66, 26 74, 10 70" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".95"/>
+            </g>
+
+            <!-- heart between them -->
+            <path d="M98 108
+                     C98 96, 114 96, 114 108
+                     C114 120, 106 125, 106 125
+                     C106 125, 98 120, 98 108 Z"
+                  fill="#ffb6c7"/>
+          </g>
+
+          <text x="152" y="250" fill="#ffffff" font-size="20" font-weight="700"
+                font-family="Quicksand, Arial, sans-serif">forever</text>
         </svg>
 
-        <div class="delivery-stamp">
-          SPECIAL DELIVERY<br>
-          CUPID POST OFFICE<br>
-          <span id="deliveryDate"></span>
+        <!-- Dark red delivery stamp (no overlap, confined text) -->
+        <div class="delivery-stamp" aria-label="Special delivery stamp">
+          <div class="line1">SPECIAL DELIVERY</div>
+          <div class="line2">CUPID POST OFFICE</div>
+          <div class="line3" id="deliveryDate"></div>
         </div>
-
       </div>
     </div>
 
+    <!-- FRONT -->
     <div class="face front">
-      <div class="flap" id="flap"></div>
+      <div class="flap" id="flap" title="Open"></div>
     </div>
 
   </div>
 </div>
 
-<!-- LETTER -->
+<!-- FIRST LETTER -->
 <div class="overlay" id="overlayLetter">
-  <div class="card">
-    <button class="close" id="closeLetter">✕</button>
-    <img src="photo.jpeg" class="photo">
+  <div class="card" id="letterCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Special Note</div>
+      <button class="close" id="closeLetterBtn" aria-label="Close">✕</button>
+    </div>
+
+    <img src="photo.jpeg" class="photo" alt="Photo 1">
+
     <div class="type">Will you be my Valentine?</div>
-    <div class="btn-row">
-      <button class="pill yes" id="yesBtn">yes</button>
+
+    <div class="btn-row" id="btnRow">
+      <button class="pill yes boop" id="yesBtn">yes</button>
       <button class="pill no" id="noBtn">no</button>
     </div>
   </div>
 </div>
 
-<!-- RESPONSE -->
+<!-- RESPONSE LETTER -->
 <div class="overlay" id="overlayResponse">
-  <div class="card">
-    <button class="close" id="closeResponse">✕</button>
-    <img src="photo2.jpeg" class="photo">
-    I love you ♥️ Thank you for being my valentine.<br><br>
-    I cant wait for our hiking date this weekend.<br><br>
-    PS. I wouldn’t have taken no for an answer.
+  <div class="card" id="responseCard" role="dialog" aria-modal="true">
+    <div class="card-header">
+      <div class="card-title">Message</div>
+      <button class="close" id="closeResponseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <img src="photo2.jpeg" class="photo" alt="Photo 2">
+
+    <div class="response-text">
+      I love you ♥️ Thank you for being my valentine.<br><br>
+      I cant wait for our hiking date this weekend.<br><br>
+      PS. I wouldn’t have taken no for an answer.
+    </div>
   </div>
 </div>
 
 <script>
-const mailbox=document.getElementById("mailbox");
-const envelopeScene=document.getElementById("envelopeScene");
-const envelopeCard=document.getElementById("envelopeCard");
-const flap=document.getElementById("flap");
+  const mailbox = document.getElementById("mailbox");
+  const envelopeScene = document.getElementById("envelopeScene");
+  const envelopeCard = document.getElementById("envelopeCard");
+  const flap = document.getElementById("flap");
 
-const overlayLetter=document.getElementById("overlayLetter");
-const overlayResponse=document.getElementById("overlayResponse");
+  const overlayLetter = document.getElementById("overlayLetter");
+  const letterCard = document.getElementById("letterCard");
+  const closeLetterBtn = document.getElementById("closeLetterBtn");
 
-document.getElementById("deliveryDate").textContent=
- new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  const overlayResponse = document.getElementById("overlayResponse");
+  const responseCard = document.getElementById("responseCard");
+  const closeResponseBtn = document.getElementById("closeResponseBtn");
 
-mailbox.onclick=()=>{
- mailbox.classList.add("opening");
- setTimeout(()=>{
-  mailbox.style.display="none";
-  envelopeScene.style.display="block";
- },300);
-};
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const btnRow = document.getElementById("btnRow");
 
-let startX=null,startY=null;
-envelopeCard.addEventListener("pointerdown",e=>{
- startX=e.clientX;startY=e.clientY;
-});
-envelopeCard.addEventListener("pointerup",e=>{
- if(startX===null)return;
- let dx=e.clientX-startX;
- let dy=e.clientY-startY;
- startX=null;startY=null;
- if(Math.max(Math.abs(dx),Math.abs(dy))>30){
-  envelopeCard.classList.toggle("showFront");
-  envelopeCard.classList.toggle("showBack");
- }
-});
+  // NO: move 3 times, 4th flies away
+  const NO_MOVE_LIMIT = 3;
+  let noClicks = 0;
 
-flap.onclick=(e)=>{
- e.stopPropagation();
- if(envelopeCard.classList.contains("showBack")){
-  envelopeCard.classList.remove("showBack");
-  envelopeCard.classList.add("showFront");
-  return;
- }
- flap.classList.add("opened");
- setTimeout(()=>overlayLetter.classList.add("show"),300);
-};
+  let heartsInterval = null;
 
-document.getElementById("closeLetter").onclick=()=>{
- overlayLetter.classList.remove("show");
- flap.classList.remove("opened");
-};
+  // date
+  const today = new Date();
+  document.getElementById("deliveryDate").textContent =
+    today.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
 
-document.getElementById("yesBtn").onclick=()=>{
- overlayLetter.classList.remove("show");
- overlayResponse.classList.add("show");
- startHearts();
-};
+  /* 1) MAILBOX -> show ENVELOPE (BACK first) */
+  mailbox.addEventListener("click", () => {
+    mailbox.classList.add("opening");
+    setTimeout(() => {
+      mailbox.style.display = "none";
+      envelopeScene.style.display = "block";
+      envelopeCard.classList.add("showBack");
+      envelopeCard.classList.remove("showFront");
+    }, 260);
+  });
 
-document.getElementById("closeResponse").onclick=()=>{
- overlayResponse.classList.remove("show");
-};
+  /* 2) SWIPE ANY DIRECTION to flip */
+  let startX=null, startY=null;
 
-function startHearts(){
- setInterval(()=>{
-  let h=document.createElement("div");
-  h.className="heart";
-  h.innerText=["💖","💗","💞","🎀"][Math.floor(Math.random()*4)];
-  h.style.left=Math.random()*100+"vw";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),7000);
- },600);
-}
+  function onStart(x,y){ startX=x; startY=y; }
+  function onEnd(x,y){
+    if(startX===null) return;
+    const dx=x-startX, dy=y-startY;
+    startX=null; startY=null;
+
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return;
+
+    // toggle
+    if (envelopeCard.classList.contains("showBack")){
+      envelopeCard.classList.remove("showBack");
+      envelopeCard.classList.add("showFront");
+    } else {
+      envelopeCard.classList.add("showBack");
+      envelopeCard.classList.remove("showFront");
+    }
+  }
+
+  envelopeCard.addEventListener("pointerdown", (e)=>onStart(e.clientX,e.clientY));
+  envelopeCard.addEventListener("pointerup",   (e)=>onEnd(e.clientX,e.clientY));
+  envelopeCard.addEventListener("pointercancel", ()=>{startX=null;startY=null;});
+
+  // optional: tap to flip too (not flap)
+  envelopeCard.addEventListener("click", (e)=>{
+    if (e.target === flap) return;
+    if (envelopeCard.classList.contains("showBack")){
+      envelopeCard.classList.remove("showBack");
+      envelopeCard.classList.add("showFront");
+    } else {
+      envelopeCard.classList.add("showBack");
+      envelopeCard.classList.remove("showFront");
+    }
+  });
+
+  /* 3) OPEN LETTER ONLY FROM FRONT (flap) */
+  flap.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (envelopeCard.classList.contains("showBack")){
+      envelopeCard.classList.remove("showBack");
+      envelopeCard.classList.add("showFront");
+      return;
+    }
+    flap.classList.add("opened");
+    setTimeout(openLetter, 220);
+  });
+
+  function openLetter(){
+    overlayLetter.classList.add("show");
+    resetNoButton();
+  }
+  function closeLetter(){
+    overlayLetter.classList.remove("show");
+    flap.classList.remove("opened");
+  }
+  function openResponse(){
+    overlayResponse.classList.add("show");
+  }
+  function closeResponse(){
+    overlayResponse.classList.remove("show");
+    stopHearts();
+  }
+
+  closeLetterBtn.addEventListener("click", closeLetter);
+  closeResponseBtn.addEventListener("click", closeResponse);
+
+  overlayLetter.addEventListener("click", closeLetter);
+  letterCard.addEventListener("click", (e) => e.stopPropagation());
+
+  overlayResponse.addEventListener("click", closeResponse);
+  responseCard.addEventListener("click", (e) => e.stopPropagation());
+
+  /* YES: open response + hearts */
+  yesBtn.addEventListener("click", () => {
+    closeLetter();
+    openResponse();
+    startHearts();
+    navigator.vibrate?.(120);
+  });
+
+  /* NO: random within letter card, shrinks each click, 4th flies away */
+  noBtn.addEventListener("click", () => {
+    noClicks++;
+
+    // shrink each click
+    const scale = Math.max(0.55, 1 - (noClicks * 0.16));
+    noBtn.style.transform = `scale(${scale})`;
+
+    // keep it inside the visible card area (not whole screen)
+    if (noClicks <= NO_MOVE_LIMIT){
+      const cardRect = letterCard.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const pad = 16;
+      const maxX = Math.max(pad, cardRect.width  - btnRect.width  - pad);
+      const maxY = Math.max(pad, cardRect.height - btnRect.height - pad);
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      noBtn.style.position = "absolute";
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    } else {
+      noBtn.disabled = true;
+      noBtn.style.transition = "transform .8s ease, opacity .8s ease";
+      noBtn.style.transform = `translateY(-500px) rotate(-18deg) scale(${scale})`;
+      noBtn.style.opacity = "0";
+      setTimeout(() => noBtn.style.display = "none", 850);
+    }
+  });
+
+  function resetNoButton(){
+    noClicks = 0;
+    noBtn.style.display = "inline-block";
+    noBtn.disabled = false;
+    noBtn.style.transition = "";
+    noBtn.style.opacity = "1";
+    noBtn.style.position = "relative";
+    noBtn.style.left = "0px";
+    noBtn.style.top  = "0px";
+    noBtn.style.transform = "scale(1)";
+  }
+
+  /* hearts */
+  function startHearts(){
+    if (heartsInterval) return;
+    heartsInterval = setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.innerText = ["💖","💗","💞","🎀","✨","🌸"][Math.floor(Math.random()*6)];
+      h.style.left = Math.random() * 100 + "vw";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 7500);
+    }, 700);
+  }
+  function stopHearts(){
+    if (!heartsInterval) return;
+    clearInterval(heartsInterval);
+    heartsInterval = null;
+  }
 </script>
 
 </body>
