@@ -67,7 +67,7 @@ body{
 }
 .mail-slot{
   width:120px;height:20px;background:#333;
-  position:absolute;top:70px;left:40px;border-radius:10px;
+  position:absolute;top:70px;left:40px;border-radius:10px;opacity:.9;
 }
 
 /* ---------------- ENVELOPE ---------------- */
@@ -244,14 +244,16 @@ body{
   94%{transform:translateY(-3px);}
 }
 
-/* ✅ floating hearts (light amount) */
+/* floating hearts (light amount) */
 .heart{
   position:fixed;
   bottom:-20px;
   font-size:22px;
   animation:float 7.5s linear;
   pointer-events:none;
-  z-index:9998;
+  z-index:9999;
+  opacity:0.9;
+
 }
 @keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
 </style>
@@ -259,9 +261,9 @@ body{
 
 <body>
 
-<!-- ✅ Piano music (Pixabay CDN) -->
-<audio id="piano" preload="auto" loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
+<!-- Music (your uploaded file) -->
+<audio id="music" preload="auto" loop>
+  <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <div class="mailbox" id="mailbox">
@@ -354,10 +356,9 @@ const overlayResponse = document.getElementById("overlayResponse");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 
-/* ✅ piano audio */
-const piano = document.getElementById("piano");
+const music = document.getElementById("music");
 
-/* ✅ hearts (light amount) */
+/* hearts (light amount) */
 let heartsInterval = null;
 let activeHearts = 0;
 const MAX_HEARTS_ON_SCREEN = 10;
@@ -369,7 +370,7 @@ function startHearts(){
 
     const h = document.createElement("div");
     h.className = "heart";
-    h.innerText = ["💖","💗","💞","🎀","✨","🌸"][Math.floor(Math.random()*6)];
+    h.innerText = ["💗","💖","❤️","💓"][Math.floor(Math.random()*4)];
     h.style.left = (Math.random() * 100) + "vw";
     document.body.appendChild(h);
     activeHearts++;
@@ -378,7 +379,7 @@ function startHearts(){
       h.remove();
       activeHearts = Math.max(0, activeHearts - 1);
     }, 7500);
-  }, 1400); // slower = fewer hearts
+  }, 1400);
 }
 
 function stopHearts(){
@@ -473,21 +474,19 @@ document.getElementById("closeResponse").onclick = () => {
   envelopeScene.style.display = "none";
   mailbox.classList.remove("opening");
 
-  // optional: reset audio position when closing
-  try{ piano.pause(); piano.currentTime = 0; }catch(e){}
+  try{ music.pause(); music.currentTime = 0; }catch(e){}
 };
 
-/* ✅ YES: play piano + hearts + open response (only on YES click) */
+/* YES: play music + hearts + open response */
 yesBtn.onclick = async () => {
   overlayLetter.classList.remove("show");
   overlayResponse.classList.add("show");
 
   try{
-    piano.volume = 0.35;
-    piano.currentTime = 0;
-    await piano.play();
+    music.volume = 0.35;
+    music.currentTime = 0;
+    await music.play();
   }catch(e){
-    // If Chrome blocks for any reason, user can tap again; but YES is a gesture so it usually works.
     console.log("Audio play blocked:", e);
   }
 
