@@ -14,8 +14,6 @@
     --pink1:#ffd6e7;
     --pink2:#ffc2d1;
     --accent:#ff4d6d;
-    --ink:#ffffff;
-    --inkDark:#e9e9e9;
 
     --envelopeW:340px;
     --envelopeH:230px;
@@ -38,7 +36,7 @@
     user-select:none;
   }
 
-  /* MAILBOX */
+  /* ---------- MAILBOX ---------- */
   .mailbox{
     width:200px;height:160px;
     background:var(--accent);
@@ -46,30 +44,47 @@
     position:relative;
     cursor:pointer;
     box-shadow:0 18px 35px rgba(0,0,0,.18);
+    transition:transform .35s ease, opacity .35s ease;
   }
+  .mailbox.opening{
+    transform:scale(.92) translateY(6px);
+    opacity:0;
+    pointer-events:none;
+  }
+
   .flag{
-    width:10px;height:60px;background:white;
+    width:10px;height:60px;background:#fff;
     position:absolute;right:-15px;top:20px;border-radius:6px;
+    box-shadow:0 10px 18px rgba(0,0,0,.12);
   }
   .mail-slot{
     width:120px;height:20px;background:#333;
     position:absolute;top:70px;left:40px;border-radius:10px;opacity:.9;
   }
 
-  /* ENVELOPE */
+  /* ---------- ENVELOPE ---------- */
   .envelope{
     display:none;
     width:var(--envelopeW);
     height:var(--envelopeH);
-    background:white;
+    background:#fff;
     border-radius:12px;
     position:relative;
     transform-style:preserve-3d;
-    transition:transform 1s;
     cursor:pointer;
     box-shadow:0 18px 40px rgba(0,0,0,.18);
+    animation:popIn .45s ease both;
   }
-  .envelope.flip{ transform:rotateY(180deg); }
+
+  @keyframes popIn{
+    from{ transform:scale(.9); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+  }
+
+  .envelope.flip{
+    transform:rotateY(180deg);
+    transition:transform 950ms cubic-bezier(.2,.9,.2,1.1);
+  }
 
   .face{
     position:absolute;
@@ -78,11 +93,7 @@
     border-radius:12px;
     overflow:hidden;
   }
-
-  /* BACK SIDE */
   .back{ background:#fff; }
-
-  /* FRONT SIDE */
   .front{
     transform:rotateY(180deg);
     background:#fff;
@@ -107,7 +118,6 @@
     height:148px;
   }
 
-  /* Forever stamp (inspired by your photo) */
   .forever-stamp{
     position:absolute;
     top:0;
@@ -118,14 +128,14 @@
     filter:drop-shadow(0 10px 16px rgba(0,0,0,.18));
   }
 
-  /* Delivery stamp overlaps forever stamp */
+  /* Delivery stamp overlaps forever stamp (DARK GREY) */
   .delivery-stamp{
     position:absolute;
-    top:66px;      /* overlap */
+    top:66px;
     right:8px;
-    width:120px;
+    width:130px;
     transform:rotate(-10deg);
-    filter:drop-shadow(0 8px 14px rgba(0,0,0,.14));
+    filter:drop-shadow(0 10px 16px rgba(0,0,0,.14));
     pointer-events:none;
   }
 
@@ -141,7 +151,12 @@
     border-top:120px solid var(--accent);
     transform-origin:top;
     cursor:pointer;
+    transition:transform .6s cubic-bezier(.2,.9,.2,1);
   }
+  .flap.opened{
+    transform:rotateX(160deg);
+  }
+
   .front::after{
     content:"";
     position:absolute;
@@ -151,26 +166,48 @@
     pointer-events:none;
   }
 
-  /* OVERLAYS (spaces around card so background shows) */
+  /* ---------- OVERLAYS / LETTERS ---------- */
   .overlay{
     position:fixed;
     inset:0;
     display:none;
     place-items:center;
-    padding:22px;               /* visible background border */
-    background:rgba(0,0,0,.16); /* soft dim */
+    padding:22px;               /* show background edges */
+    background:rgba(0,0,0,.16);
+  }
+
+  .overlay.show{
+    display:grid;
+    animation:fadeIn .2s ease both;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
   }
 
   .card{
     width:min(92vw, var(--cardMax));
     max-height:82vh;
     overflow:auto;
-    background:white;
+    background:#fff;
     border-radius:18px;
     box-shadow:0 22px 55px rgba(0,0,0,.24);
     padding:16px 16px 22px;
-    position:relative;
     min-height:var(--cardMinH);
+    animation:cardIn .28s ease both;
+  }
+
+  @keyframes cardIn{
+    from{ transform:translateY(10px) scale(.985); opacity:0; }
+    to{ transform:translateY(0) scale(1); opacity:1; }
+  }
+
+  .card.switchOut{
+    animation:cardOut .22s ease both;
+  }
+  @keyframes cardOut{
+    to{ transform:translateY(-6px) scale(.985); opacity:0; }
   }
 
   .card-header{
@@ -183,10 +220,7 @@
     margin-bottom:12px;
   }
 
-  .card-title{
-    font-weight:800;
-    font-size:18px;
-  }
+  .card-title{ font-weight:800; font-size:18px; }
 
   .close{
     width:42px;height:42px;
@@ -200,16 +234,15 @@
   .close:hover{ background:rgba(0,0,0,.10); transform:translateY(-1px); }
   .close:active{ transform:scale(.98); }
 
-  /* Images: fit inside letter/card */
+  /* photos: full natural height; card scroll handles it */
   .photo{
     width:100%;
-    height:clamp(140px, 28vh, 240px);
-    object-fit:cover;
+    height:auto;
+    display:block;
     border-radius:14px;
     margin:10px 0 14px;
   }
 
-  /* typing line */
   .type{
     font-size:22px;
     font-weight:800;
@@ -228,10 +261,10 @@
     flex-wrap:wrap;
     align-items:center;
     position:relative;
-    min-height:64px;
+    min-height:86px; /* more room for the NO to roam */
   }
 
-  /* Rounded pill, non-cursive font */
+  /* pill buttons */
   .pill{
     font-family:'Quicksand', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     font-size:18px;
@@ -241,9 +274,10 @@
     border-radius:999px;
     cursor:pointer;
     letter-spacing:.3px;
-    text-transform:lowercase; /* yes / no */
+    text-transform:lowercase;
     transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
     box-shadow:0 12px 24px rgba(0,0,0,.12);
+    will-change:transform;
   }
   .pill:hover{
     transform:translateY(-2px);
@@ -256,7 +290,19 @@
   .no{
     background:#2f2f2f;
     color:#fff;
-    position:relative; /* becomes absolute once it starts moving */
+    position:relative;
+  }
+
+  /* YES tiny jump every couple seconds */
+  .yes.boop{
+    animation:yesBoop 2.2s ease-in-out infinite;
+  }
+  @keyframes yesBoop{
+    0%, 82%, 100% { transform:translateY(0); }
+    86% { transform:translateY(-5px); }
+    90% { transform:translateY(0); }
+    94% { transform:translateY(-3px); }
+    98% { transform:translateY(0); }
   }
 
   .response-text{
@@ -265,7 +311,7 @@
     font-weight:700;
   }
 
-  /* HEARTS */
+  /* Floating hearts */
   .heart{
     position:fixed;
     bottom:-20px;
@@ -281,10 +327,12 @@
 
 <body>
 
-<!-- Romantic public/free music (Pixabay CDN) -->
-<audio id="music" preload="auto" loop>
-  <!-- You can swap this for another Pixabay CDN MP3 anytime -->
-  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3?filename=romantic-piano-112191.mp3" type="audio/mpeg">
+<!-- Music: new source + stronger “unlock on first user gesture” -->
+<audio id="music" preload="auto" loop crossorigin="anonymous">
+  <!-- If one host fails, the next one may work -->
+  <source src="https://cdn.pixabay.com/download/audio/2022/05/23/audio_4f9d6a0c5d.mp3" type="audio/mpeg">
+  <!-- fallback (non-romantic, but reliable if pixabay blocks in some environments) -->
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
 </audio>
 
 <div class="mailbox" id="mailbox" aria-label="Mailbox">
@@ -297,15 +345,14 @@
   <!-- BACK -->
   <div class="face back">
     <div class="tofrom">
-      To Aaron<br>
-      From Rizza
+      To Aaron 💘<br>
+      From Rizza 🎀
     </div>
 
     <div class="stamp-area">
 
       <!-- Forever stamp (SVG so it never “breaks”) -->
       <svg class="forever-stamp" viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg" aria-label="Forever stamp">
-        <!-- perforated edge -->
         <defs>
           <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="rgba(0,0,0,.15)"/>
@@ -313,31 +360,23 @@
         </defs>
 
         <rect x="12" y="12" width="196" height="256" rx="10" fill="#b0192b" filter="url(#soft)"/>
-        <!-- faux perforation border -->
         <rect x="16" y="16" width="188" height="248" rx="8" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="6" stroke-dasharray="2 12" />
 
-        <!-- 'us forever' -->
         <text x="28" y="55" fill="#ffffff" font-size="24" font-weight="700" font-family="Quicksand, Arial, sans-serif">
           us forever
         </text>
 
-        <!-- simple dove + envelope icon inspired by your stamp -->
         <g transform="translate(28,78)">
-          <!-- envelope -->
           <rect x="92" y="10" width="72" height="52" rx="8" fill="#ffb6c7"/>
           <path d="M92 16 L128 42 L164 16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
           <circle cx="150" cy="42" r="9" fill="#ff3b5c"/>
-          <!-- dove body -->
           <path d="M6 88 C24 62, 54 52, 82 56 C112 60, 124 74, 130 98
                    C132 108, 128 120, 118 130 C92 158, 52 160, 24 140
                    C10 130, 2 112, 6 88 Z"
                 fill="#ffffff" opacity=".95"/>
-          <!-- wings -->
           <path d="M46 72 L100 44 L110 58 L60 86 Z" fill="#ffffff"/>
           <path d="M52 108 L110 86 L114 100 L64 130 Z" fill="#ffffff" opacity=".95"/>
-          <!-- beak -->
           <path d="M130 92 L150 86 L146 98 Z" fill="#ffd1dc"/>
-          <!-- tiny heart -->
           <path d="M98 132
                    C98 124, 110 124, 110 132
                    C110 140, 104 144, 104 144
@@ -345,70 +384,69 @@
                 fill="#ff3b5c"/>
         </g>
 
-        <!-- bottom tiny text -->
-        <text x="160" y="250" fill="#ffffff" font-size="20" font-weight="700" font-family="Quicksand, Arial, sans-serif">
+        <text x="152" y="250" fill="#ffffff" font-size="20" font-weight="700" font-family="Quicksand, Arial, sans-serif">
           forever
         </text>
       </svg>
 
-      <!-- Special Delivery stamp (overlapping + includes location + today) -->
+      <!-- SPECIAL DELIVERY (dark grey, text confined in box) -->
       <svg class="delivery-stamp" viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" aria-label="Special delivery stamp">
         <defs>
-          <!-- dotted border effect -->
           <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
-            <circle cx="7" cy="7" r="2.1" fill="#ffffff" opacity=".95"/>
+            <circle cx="7" cy="7" r="2.1" fill="#555" opacity=".9"/>
           </pattern>
-          <filter id="distress" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" />
-            <feColorMatrix type="matrix" values="
-              1 0 0 0 0
-              0 1 0 0 0
-              0 0 1 0 0
-              0 0 0 .15 0" result="noise"/>
-            <feComposite in="SourceGraphic" in2="noise" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
-          </filter>
         </defs>
 
         <!-- outer -->
-        <rect x="12" y="12" width="496" height="276" rx="16" fill="none" stroke="#ffffff" stroke-width="10" opacity=".95" />
+        <rect x="12" y="12" width="496" height="276" rx="16" fill="none" stroke="#555" stroke-width="10" opacity=".92" />
         <!-- dotted inner -->
-        <rect x="26" y="26" width="468" height="248" rx="12" fill="none" stroke="url(#dots)" stroke-width="10" opacity=".95" />
+        <rect x="26" y="26" width="468" height="248" rx="12" fill="none" stroke="url(#dots)" stroke-width="10" opacity=".92" />
 
         <!-- stars -->
-        <g fill="#ffffff" opacity=".95" transform="translate(0,0)">
+        <g fill="#555" opacity=".9">
           <path d="M260 56 l10 20 22 3-16 15 4 22-20-11-20 11 4-22-16-15 22-3z"/>
           <path d="M210 70 l6 12 14 2-10 9 2 14-12-6-12 6 2-14-10-9 14-2z"/>
           <path d="M310 70 l6 12 14 2-10 9 2 14-12-6-12 6 2-14-10-9 14-2z"/>
         </g>
 
-        <!-- SPECIAL DELIVERY -->
         <text x="260" y="112"
               text-anchor="middle"
-              fill="#ffffff"
+              fill="#555"
               font-size="54"
               font-weight="800"
               font-family="Quicksand, Arial, sans-serif"
               letter-spacing="2"
-              filter="url(#distress)">
+              opacity=".92">
           SPECIAL DELIVERY
         </text>
 
         <!-- wavy lines -->
-        <g stroke="#ffffff" stroke-width="6" opacity=".92" fill="none" transform="translate(0,0)">
+        <g stroke="#555" stroke-width="6" opacity=".9" fill="none">
           <path d="M80 150 C130 130, 180 170, 230 150 S330 170, 380 150 S460 170, 500 150"/>
           <path d="M80 172 C130 152, 180 192, 230 172 S330 192, 380 172 S460 192, 500 172"/>
           <path d="M80 194 C130 174, 180 214, 230 194 S330 214, 380 194 S460 214, 500 194"/>
         </g>
 
         <!-- bottom strip -->
-        <rect x="60" y="218" width="400" height="56" rx="12" fill="none" stroke="#ffffff" stroke-width="8" opacity=".95"/>
-        <text x="260" y="255" text-anchor="middle"
-              fill="#ffffff"
-              font-size="26"
+        <rect x="58" y="214" width="404" height="64" rx="12" fill="none" stroke="#555" stroke-width="8" opacity=".92"/>
+
+        <!-- confined text -->
+        <text x="260" y="244" text-anchor="middle"
+              fill="#555"
+              font-size="22"
               font-weight="800"
               font-family="Quicksand, Arial, sans-serif"
-              letter-spacing="1">
-          CUPID POST OFFICE • <tspan id="deliveryDate"></tspan>
+              letter-spacing="1"
+              opacity=".95">
+          CUPID POST OFFICE
+        </text>
+        <text x="260" y="268" text-anchor="middle"
+              fill="#555"
+              font-size="18"
+              font-weight="800"
+              font-family="Quicksand, Arial, sans-serif"
+              opacity=".95">
+          <tspan id="deliveryDate"></tspan>
         </text>
       </svg>
 
@@ -434,7 +472,7 @@
     <div class="type">Will you be my Valentine?</div>
 
     <div class="btn-row" id="btnRow">
-      <button class="pill yes" id="yesBtn">yes</button>
+      <button class="pill yes boop" id="yesBtn">yes</button>
       <button class="pill no" id="noBtn">no</button>
     </div>
   </div>
@@ -481,127 +519,156 @@
   const NO_MOVE_LIMIT = 3;
   let noClicks = 0;
 
-  // hearts interval
+  // hearts
   let heartsInterval = null;
 
-  /* DATE (for delivery stamp) */
+  // Date in delivery stamp
   const today = new Date();
-  const niceDate = today.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
-  document.getElementById("deliveryDate").textContent = niceDate;
+  document.getElementById("deliveryDate").textContent =
+    today.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
 
-  /* MUSIC UNLOCK: required by mobile browsers */
-  let audioUnlocked = false;
-  function unlockAudioOnce(){
-    if (audioUnlocked) return;
-    audioUnlocked = true;
+  /* ---------- MUSIC FIX (mobile) ---------- */
+  // Browsers require a user gesture: we “unlock” audio on first tap/click anywhere.
+  let unlocked = false;
+  function unlockAudio(){
+    if (unlocked) return;
+    unlocked = true;
 
-    // quick silent play/pause to unlock
-    music.volume = 0.001;
-    music.muted = true;
-
-    const p = music.play();
-    if (p && typeof p.then === "function"){
-      p.then(() => {
-        music.pause();
-        music.currentTime = 0;
+    try{
+      music.muted = true;
+      music.volume = 0;
+      const p = music.play();
+      if (p && typeof p.then === "function"){
+        p.then(() => {
+          music.pause();
+          music.currentTime = 0;
+          music.muted = false;
+          music.volume = 0.35;
+        }).catch(() => {
+          music.muted = false;
+          music.volume = 0.35;
+        });
+      } else {
         music.muted = false;
         music.volume = 0.35;
-      }).catch(() => {
-        // still usually works on YES click since it's a gesture
-        music.muted = false;
-        music.volume = 0.35;
-      });
-    } else {
+      }
+    }catch(e){
+      // If it fails here, it may still work on YES click.
       music.muted = false;
       music.volume = 0.35;
     }
   }
-  window.addEventListener("pointerdown", unlockAudioOnce, { once:true });
+  window.addEventListener("pointerdown", unlockAudio, { once:true });
 
-  /* MAILBOX -> ENVELOPE */
+  /* ---------- MAILBOX -> ENVELOPE (animated) ---------- */
   mailbox.addEventListener("click", () => {
-    mailbox.style.display = "none";
-    envelope.style.display = "block";
+    mailbox.classList.add("opening");
+    setTimeout(() => {
+      mailbox.style.display = "none";
+      envelope.style.display = "block";
+    }, 260);
   });
 
-  /* FLIP ENVELOPE (click envelope) */
+  /* ---------- FLIP ENVELOPE ---------- */
   envelope.addEventListener("click", (e) => {
     if (e.target === flap) return;
     envelope.classList.toggle("flip");
   });
 
-  /* OPEN FIRST LETTER */
+  /* ---------- OPEN LETTER (flap anim) ---------- */
   flap.addEventListener("click", (e) => {
     e.stopPropagation();
-    openLetter();
+    flap.classList.add("opened");
+    setTimeout(() => openLetter(), 220);
   });
 
   function openLetter(){
-    overlayLetter.style.display = "grid";
+    overlayLetter.classList.add("show");
     resetNoButton();
   }
 
   function closeLetter(){
-    overlayLetter.style.display = "none";
+    overlayLetter.classList.remove("show");
+    flap.classList.remove("opened");
   }
 
   function openResponse(){
-    overlayResponse.style.display = "grid";
+    overlayResponse.classList.add("show");
   }
 
   function closeResponse(){
-    overlayResponse.style.display = "none";
+    overlayResponse.classList.remove("show");
+    stopHearts();
+    // optional: stop music when closing response
+    try{ music.pause(); }catch(e){}
   }
 
   closeLetterBtn.addEventListener("click", closeLetter);
   closeResponseBtn.addEventListener("click", closeResponse);
 
-  /* click outside closes */
+  // click outside closes
   overlayLetter.addEventListener("click", closeLetter);
   letterCard.addEventListener("click", (e) => e.stopPropagation());
 
   overlayResponse.addEventListener("click", closeResponse);
   responseCard.addEventListener("click", (e) => e.stopPropagation());
 
-  /* YES: hide first letter, open response + music + hearts */
-  yesBtn.addEventListener("click", async () => {
-    closeLetter();
-    openResponse();
+  /* ---------- YES: switch letters + play music + hearts ---------- */
+  yesBtn.addEventListener("click", () => {
+    // nice switch animation
+    letterCard.classList.add("switchOut");
+    setTimeout(() => {
+      closeLetter();
+      letterCard.classList.remove("switchOut");
+      openResponse();
+    }, 180);
 
+    // play music on YES (gesture) — no await (iOS friendlier)
     try{
       music.currentTime = 0;
       music.volume = 0.35;
-      await music.play();
-    }catch(e){
-      // If something blocks, user can tap once more; but the unlock handler should prevent this.
-      console.warn("Music blocked:", e);
-    }
+      music.play();
+    }catch(e){}
 
     startHearts();
-    navigator.vibrate?.(200);
+    navigator.vibrate?.(120);
   });
 
-  /* NO: move 3 times, 4th flies away */
+  /* ---------- NO: farther movement each click + smaller each click ---------- */
   noBtn.addEventListener("click", () => {
     noClicks++;
 
+    // shrink each click (down to a limit)
+    const scale = Math.max(0.55, 1 - (noClicks * 0.12));
+    noBtn.style.transform = `scale(${scale})`;
+
     if (noClicks <= NO_MOVE_LIMIT){
-      const rowRect = btnRow.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
+      // Move within the card (farther each time)
+      const cardRect = letterCard.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
 
-      const maxX = Math.max(0, rowRect.width - btnRect.width - 12);
-      const maxY = Math.max(0, rowRect.height - btnRect.height - 12);
+      // padding so it stays inside
+      const pad = 16;
 
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
+      // max travel inside card (account for shrink)
+      const maxX = Math.max(0, cardRect.width  - btnRect.width  - pad*2);
+      const maxY = Math.max(0, cardRect.height - btnRect.height - pad*2);
+
+      // increase range each click (but still clamped by max)
+      const rangeFactor = Math.min(1, 0.45 + (noClicks * 0.25)); // 1st smaller, later bigger
+      const x = (Math.random() * maxX) * rangeFactor + pad;
+      const y = (Math.random() * maxY) * rangeFactor + pad;
 
       noBtn.style.position = "absolute";
-      noBtn.style.left = x + "px";
-      noBtn.style.top  = y + "px";
+      // position relative to card
+      const cardOffset = letterCard.getBoundingClientRect();
+      noBtn.style.left = (x) + "px";
+      noBtn.style.top  = (y) + "px";
     } else {
+      // 4th click: fly away
       noBtn.disabled = true;
       noBtn.style.transition = "transform .8s ease, opacity .8s ease";
-      noBtn.style.transform = "translateY(-500px) rotate(-18deg)";
+      noBtn.style.transform = `translateY(-500px) rotate(-18deg) scale(${scale})`;
       noBtn.style.opacity = "0";
       setTimeout(() => noBtn.style.display = "none", 850);
     }
@@ -613,16 +680,15 @@
     noBtn.disabled = false;
     noBtn.style.transition = "";
     noBtn.style.opacity = "1";
-    noBtn.style.transform = "none";
     noBtn.style.position = "relative";
     noBtn.style.left = "0px";
-    noBtn.style.top = "0px";
+    noBtn.style.top  = "0px";
+    noBtn.style.transform = "scale(1)";
   }
 
-  /* HEARTS */
+  /* ---------- HEARTS ---------- */
   function startHearts(){
     if (heartsInterval) return;
-
     heartsInterval = setInterval(() => {
       const h = document.createElement("div");
       h.className = "heart";
@@ -630,7 +696,13 @@
       h.style.left = Math.random() * 100 + "vw";
       document.body.appendChild(h);
       setTimeout(() => h.remove(), 7500);
-    }, 800);
+    }, 700);
+  }
+
+  function stopHearts(){
+    if (!heartsInterval) return;
+    clearInterval(heartsInterval);
+    heartsInterval = null;
   }
 </script>
 
