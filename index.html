@@ -271,3 +271,285 @@ body{
 </head>
 
 <body>
+<!-- Music -->
+<audio id="music" preload="auto" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="mailbox" id="mailbox">
+  <div class="flag-pole"></div>
+  <div class="flag-triangle"></div>
+  <div class="mail-slot"></div>
+</div>
+
+<div class="envelope-scene" id="envelopeScene">
+  <div class="envelope-card showBack" id="envelopeCard">
+
+    <div class="face back">
+      <div class="tofrom">
+        To Aaron 💘<br>
+        From Rizza 🎀
+      </div>
+
+      <div class="stamp-area">
+
+        <!-- Smaller minimal US Forever stamp -->
+        <svg class="forever-stamp" viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="12" width="196" height="256" rx="18" fill="#ff6aa8"/>
+          <text x="28" y="56"
+                fill="#ffffff"
+                font-size="22"
+                font-weight="800"
+                font-family="Quicksand, Arial, sans-serif">
+            US Forever
+          </text>
+
+          <!-- white heart -->
+          <path d="M95 160
+                   C95 138,125 138,125 160
+                   C125 180,95 200,95 200
+                   C95 200,65 180,65 160
+                   C65 138,95 138,95 160 Z"
+                fill="#ffffff"/>
+
+          <!-- blush pink heart -->
+          <path d="M135 170
+                   C135 148,165 148,165 170
+                   C165 190,135 210,135 210
+                   C135 210,105 190,105 170
+                   C105 148,135 148,135 170 Z"
+                fill="#ffd1dc"/>
+        </svg>
+
+        <div class="delivery-stamp">
+          <div>SPECIAL DELIVERY</div>
+          <div>CUPID POST OFFICE</div>
+          <div id="deliveryDate"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="face front">
+      <div class="flap" id="flap"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FIRST LETTER -->
+<div class="overlay" id="overlayLetter">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Special Note</div>
+      <button class="close" id="closeLetter">✕</button>
+    </div>
+
+    <div class="card-body">
+      <img src="photo.jpeg" class="photo">
+      <div class="type">Will you be my Valentine?</div>
+
+      <div class="btn-row">
+        <button class="pill yes boop" id="yesBtn">yes</button>
+        <button class="pill no" id="noBtn">no</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESPONSE -->
+<div class="overlay" id="overlayResponse">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Message</div>
+      <button class="close" id="closeResponse">✕</button>
+    </div>
+
+    <div class="card-body">
+      <img src="photo2.jpeg" class="photo">
+      I love you ♥️ Thank you for being my valentine.<br><br>
+      I cant wait for our hiking date this weekend.<br><br>
+      PS. I wouldn’t have taken no for an answer.
+      <br><br>
+      Love, Rizza
+    </div>
+  </div>
+</div>
+
+<script>
+const mailbox = document.getElementById("mailbox");
+const envelopeScene = document.getElementById("envelopeScene");
+const envelopeCard = document.getElementById("envelopeCard");
+const flap = document.getElementById("flap");
+
+const overlayLetter = document.getElementById("overlayLetter");
+const overlayResponse = document.getElementById("overlayResponse");
+
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+
+const music = document.getElementById("music");
+
+/* Date */
+document.getElementById("deliveryDate").textContent =
+  new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+
+/* Flip helpers */
+function showBack(){
+  envelopeCard.classList.add("showBack");
+  envelopeCard.classList.remove("showFront");
+}
+function showFront(){
+  envelopeCard.classList.add("showFront");
+  envelopeCard.classList.remove("showBack");
+}
+
+/* Mailbox */
+mailbox.onclick = () => {
+  mailbox.classList.add("opening");
+  setTimeout(() => {
+    mailbox.style.display = "none";
+    envelopeScene.style.display = "block";
+    showBack();
+  }, 300);
+};
+
+/* Flip envelope */
+envelopeCard.onclick = (e) => {
+  if (e.target === flap) return;
+  if (envelopeCard.classList.contains("showBack")) showFront();
+  else showBack();
+};
+
+/* Open flap */
+flap.onclick = (e) => {
+  e.stopPropagation();
+  if (envelopeCard.classList.contains("showBack")) {
+    showFront();
+    return;
+  }
+  flap.classList.add("opened");
+  setTimeout(() => overlayLetter.classList.add("show"), 300);
+};
+
+/* Return to envelope */
+function returnToEnvelope(){
+  overlayLetter.classList.remove("show");
+  overlayResponse.classList.remove("show");
+  flap.classList.remove("opened");
+  resetNoButton();
+  stopHearts();
+  try{ music.pause(); music.currentTime = 0; }catch(e){}
+  envelopeScene.style.display = "block";
+  mailbox.style.display = "none";
+  showFront();
+}
+
+/* Hearts */
+let heartsInterval = null;
+function spawnHeart(){
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerText = ["💗","💖","❤️","💓"][Math.floor(Math.random()*4)];
+  h.style.left = (Math.random()*100)+"vw";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7500);
+}
+function startHearts(){
+  spawnHeart();
+  if(!heartsInterval){
+    heartsInterval=setInterval(spawnHeart,1400);
+  }
+}
+function stopHearts(){
+  clearInterval(heartsInterval);
+  heartsInterval=null;
+}
+
+/* NO button teleport */
+let noClicks=0;
+let hoverAttempts=0;
+const LIMIT=4;
+const RADIUS=20;
+
+function resetNoButton(){
+  noClicks=0;
+  hoverAttempts=0;
+  noBtn.disabled=false;
+  noBtn.style.display="inline-block";
+  noBtn.style.opacity="1";
+  noBtn.style.transition="";
+  noBtn.style.position="relative";
+  noBtn.style.left="0";
+  noBtn.style.top="0";
+  noBtn.style.transform="none";
+  noBtn.style.zIndex="10";
+}
+
+function teleportNoButton(){
+  noBtn.style.position="fixed";
+  noBtn.style.zIndex="9999";
+  noBtn.style.transform="translate(-50%,-50%)";
+  const pad=20;
+  const x=Math.random()*(window.innerWidth-pad*2)+pad;
+  const y=Math.random()*(window.innerHeight-pad*2)+pad;
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+}
+
+function flyAwayNoButton(){
+  noBtn.disabled=true;
+  noBtn.style.transition="transform .8s ease, opacity .8s ease";
+  noBtn.style.transform="translate(-50%,-50%) translateY(-600px) rotate(-15deg)";
+  noBtn.style.opacity="0";
+  setTimeout(()=>noBtn.style.display="none",800);
+}
+
+noBtn.onclick=()=>{
+  noClicks++;
+  if(noClicks<LIMIT) teleportNoButton();
+  else flyAwayNoButton();
+};
+
+if(window.matchMedia("(hover: hover)").matches){
+  noBtn.addEventListener("mouseenter",()=>{
+    if(noBtn.disabled||noBtn.style.display==="none")return;
+    hoverAttempts++;
+    if(hoverAttempts<LIMIT) teleportNoButton();
+    else flyAwayNoButton();
+  });
+
+  document.addEventListener("mousemove",(e)=>{
+    if(noBtn.disabled||noBtn.style.display==="none")return;
+    const rect=noBtn.getBoundingClientRect();
+    const nearestX=Math.max(rect.left,Math.min(e.clientX,rect.right));
+    const nearestY=Math.max(rect.top,Math.min(e.clientY,rect.bottom));
+    const dx=e.clientX-nearestX;
+    const dy=e.clientY-nearestY;
+    const distance=Math.sqrt(dx*dx+dy*dy);
+    if(distance<=RADIUS){
+      hoverAttempts++;
+      if(hoverAttempts<LIMIT) teleportNoButton();
+      else flyAwayNoButton();
+    }
+  });
+}
+
+/* Close buttons */
+document.getElementById("closeLetter").onclick=returnToEnvelope;
+document.getElementById("closeResponse").onclick=returnToEnvelope;
+
+/* YES button */
+yesBtn.onclick=async()=>{
+  overlayLetter.classList.remove("show");
+  overlayResponse.classList.add("show");
+  try{
+    music.volume=0.35;
+    music.currentTime=0;
+    await music.play();
+  }catch(e){}
+  startHearts();
+};
+</script>
+
+</body>
+</html>
