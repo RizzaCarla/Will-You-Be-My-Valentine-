@@ -162,13 +162,23 @@ body{
 .card{
   width:min(92vw,var(--cardMax));
   max-height:82vh;
-  overflow:auto;
   background:#fff;
   border-radius:18px;
   padding:16px 16px 22px;
   box-shadow:0 22px 55px rgba(0,0,0,.25);
   position:relative;
+
+  display:flex;           /* ✅ */
+  flex-direction:column;  /* ✅ */
+  overflow:hidden;        /* ✅ */
 }
+
+.card-body{
+  overflow:auto;          /* ✅ only body scrolls */
+  flex:1;                 /* ✅ fills remaining height */
+  padding-right:6px;      /* optional: avoids scrollbar overlaying text */
+}
+
 
 /* HEADERS */
 .card-header{
@@ -203,17 +213,13 @@ body{
   white-space:nowrap;
   overflow:hidden;
   width:0;
-  animation:typing 2.2s steps(34,end) forwards,
-            removeCursor .1s linear 2.2s forwards;
+  animation:
+    typing 2.2s steps(34,end) forwards,
+    removeCursor 0s linear 2.2s forwards;
 }
 
-@keyframes typing{
-  to{ width:100%; }
-}
-
-@keyframes removeCursor{
-  to{ border-right:0; }
-}
+@keyframes typing{ to{ width:100%; } }
+@keyframes removeCursor{ to{ border-right:0; } }
 
 .btn-row{
   margin-top:16px;
@@ -275,25 +281,23 @@ body{
 }
 @keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
 
-  /* Cute Scrollbar */
-.card::-webkit-scrollbar{
+/* Cute Scrollbar (only inside letter content) */
+.card-body::-webkit-scrollbar{
   width:10px;
 }
-
-.card::-webkit-scrollbar-track{
+.card-body::-webkit-scrollbar-track{
   background:rgba(255,255,255,0.6);
   border-radius:20px;
 }
-
-.card::-webkit-scrollbar-thumb{
+.card-body::-webkit-scrollbar-thumb{
   background:linear-gradient(180deg,#ff8fc1,#ff4d6d);
   border-radius:20px;
   border:2px solid rgba(255,255,255,0.6);
 }
-
-.card::-webkit-scrollbar-thumb:hover{
+.card-body::-webkit-scrollbar-thumb:hover{
   background:linear-gradient(180deg,#ff6aa8,#ff355c);
 }
+
 
 </style>
 </head>
@@ -393,13 +397,16 @@ body{
       <button class="close" id="closeLetter">✕</button>
     </div>
 
-    <img src="photo.jpeg" class="photo">
-    <div class="type">Will you be my Valentine?</div>
+<div class="card-body">
+  <img src="photo.jpeg" class="photo">
+  <div class="type">Will you be my Valentine?</div>
 
-    <div class="btn-row">
-      <button class="pill yes boop" id="yesBtn">yes</button>
-      <button class="pill no" id="noBtn">no</button>
-    </div>
+  <div class="btn-row">
+    <button class="pill yes boop" id="yesBtn">yes</button>
+    <button class="pill no" id="noBtn">no</button>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -411,12 +418,15 @@ body{
       <button class="close" id="closeResponse">✕</button>
     </div>
 
-    <img src="photo2.jpeg" class="photo">
-    I love you ♥️ Thank you for being my valentine.<br><br>
-    I cant wait for our hiking date this weekend.<br><br>
-    PS. I wouldn’t have taken no for an answer.
-    <br><br>
-    Love, Rizza
+<div class="card-body">
+  <img src="photo2.jpeg" class="photo">
+  I love you ♥️ Thank you for being my valentine.<br><br>
+  I cant wait for our hiking date this weekend.<br><br>
+  PS. I wouldn’t have taken no for an answer.
+  <br><br>
+  Love, Rizza
+</div>
+
   </div>
 </div>
 
