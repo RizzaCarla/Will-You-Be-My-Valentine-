@@ -197,12 +197,23 @@ body{
 }
 
 .type{
-  font-size:22px;font-weight:800;
+  font-size:22px;
+  font-weight:800;
   border-right:3px solid var(--accent);
-  white-space:nowrap;overflow:hidden;width:0;
-  animation:typing 2.2s steps(34,end) forwards;
+  white-space:nowrap;
+  overflow:hidden;
+  width:0;
+  animation:typing 2.2s steps(34,end) forwards,
+            removeCursor .1s linear 2.2s forwards;
 }
-@keyframes typing{to{width:100%;}}
+
+@keyframes typing{
+  to{ width:100%; }
+}
+
+@keyframes removeCursor{
+  to{ border-right:0; }
+}
 
 .btn-row{
   margin-top:16px;
@@ -263,6 +274,27 @@ body{
   opacity:0.9;
 }
 @keyframes float{ to{ transform:translateY(-110vh); opacity:0; } }
+
+  /* Cute Scrollbar */
+.card::-webkit-scrollbar{
+  width:10px;
+}
+
+.card::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.6);
+  border-radius:20px;
+}
+
+.card::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#ff8fc1,#ff4d6d);
+  border-radius:20px;
+  border:2px solid rgba(255,255,255,0.6);
+}
+
+.card::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#ff6aa8,#ff355c);
+}
+
 </style>
 </head>
 
