@@ -363,24 +363,32 @@ let heartsInterval = null;
 let activeHearts = 0;
 const MAX_HEARTS_ON_SCREEN = 10;
 
+function spawnHeart(){
+  if (activeHearts >= MAX_HEARTS_ON_SCREEN) return;
+
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerText = ["💗","💖","❤️","💓"][Math.floor(Math.random()*4)];
+  h.style.left = (Math.random() * 100) + "vw";
+  document.body.appendChild(h);
+  activeHearts++;
+
+  setTimeout(() => {
+    h.remove();
+    activeHearts = Math.max(0, activeHearts - 1);
+  }, 7500);
+}
+
 function startHearts(){
   if (heartsInterval) return;
+
+  spawnHeart(); // ✅ immediate heart
+
   heartsInterval = setInterval(() => {
-    if (activeHearts >= MAX_HEARTS_ON_SCREEN) return;
-
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.innerText = ["💗","💖","❤️","💓"][Math.floor(Math.random()*4)];
-    h.style.left = (Math.random() * 100) + "vw";
-    document.body.appendChild(h);
-    activeHearts++;
-
-    setTimeout(() => {
-      h.remove();
-      activeHearts = Math.max(0, activeHearts - 1);
-    }, 7500);
+    spawnHeart();
   }, 1400);
 }
+
 
 function stopHearts(){
   if (!heartsInterval) return;
