@@ -1,136 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Special Delivery 💌</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 
 <style>
-body {
-  margin: 0;
-  font-family: 'Dancing Script', cursive;
-  background: linear-gradient(135deg, #ffb6c1, #ff69b4);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+body{
+  margin:0;
+  font-family:'Dancing Script',cursive;
+  background:linear-gradient(135deg,#ffd6e7,#ffc2d1);
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Floating hearts */
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 20px;
-  animation: floatUp 8s linear infinite;
-  opacity: 0.7;
+/* MAILBOX */
+.mailbox{
+  width:200px;height:160px;
+  background:#ff4d6d;
+  border-radius:20px;
+  position:relative;
+  cursor:pointer;
+  transition:1s;
 }
-@keyframes floatUp {
-  to {
-    transform: translateY(-110vh);
-    opacity: 0;
-  }
+.flag{
+  width:10px;height:60px;
+  background:white;
+  position:absolute;right:-15px;top:20px;
 }
-
-/* Envelope */
-.envelope {
-  width: 320px;
-  height: 220px;
-  background: white;
-  position: relative;
-  cursor: pointer;
-  border-radius: 10px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+.flag:after{
+  content:"";
+  position:absolute;
+  border-left:30px solid white;
+  border-top:15px solid transparent;
+  border-bottom:15px solid transparent;
+  left:10px;
 }
-
-.flap {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-left: 160px solid transparent;
-  border-right: 160px solid transparent;
-  border-top: 120px solid #ff4d6d;
-  transform-origin: top;
-  transition: 0.8s;
+.mail-slot{
+  width:120px;height:20px;
+  background:#333;
+  position:absolute;
+  top:70px;left:40px;
+  border-radius:10px;
 }
 
-.envelope.open .flap {
-  transform: rotateX(180deg);
+/* ENVELOPE */
+.envelope{
+  display:none;
+  width:340px;height:230px;
+  background:white;
+  border-radius:12px;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:1s;
+  cursor:pointer;
+}
+.envelope.flip{ transform:rotateY(180deg); }
+
+.face{
+  position:absolute;
+  width:100%;height:100%;
+  backface-visibility:hidden;
+  border-radius:12px;
 }
 
-.address {
-  position: absolute;
-  top: 90px;
-  left: 40px;
-  font-size: 26px;
+/* BACK */
+.zigzag{
+  border:3px dashed #ff4d6d;
+  width:90px;height:60px;
+  position:absolute;
+  top:20px;right:20px;
+}
+.postmark{
+  position:absolute;
+  bottom:20px;left:20px;
+  font-size:20px;
+}
+.address{
+  position:absolute;
+  bottom:20px;right:20px;
+  font-size:22px;
 }
 
-.stamp {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  background: #ff4d6d;
-  color: white;
-  padding: 10px;
-  border-radius: 6px;
+/* FRONT */
+.front{ transform:rotateY(180deg); }
+
+.flap{
+  position:absolute;
+  border-left:170px solid transparent;
+  border-right:170px solid transparent;
+  border-top:120px solid #ff4d6d;
+  transform-origin:top;
 }
 
-/* Letter */
-.letter {
-  display: none;
-  text-align: center;
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  width: 360px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  animation: popIn 1s ease;
+/* LETTER */
+.letter{
+  display:none;
+  position:absolute;
+  background:white;
+  width:280px;
+  top:40px;left:30px;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
 }
 
-@keyframes popIn {
-  from { transform: scale(.2); opacity:0;}
-  to { transform: scale(1); opacity:1;}
+.photo{
+  width:100%;
+  border-radius:10px;
+  margin-bottom:15px;
 }
 
-.countdown {
-  font-size: 22px;
-  margin-bottom: 15px;
-  color: #ff4d6d;
+/* handwriting animation */
+.type{
+  overflow:hidden;
+  white-space:nowrap;
+  border-right:3px solid pink;
+  width:0;
+  font-size:28px;
+  animation:typing 3s steps(40,end) forwards;
+}
+@keyframes typing{ to{ width:100%; } }
+
+button{
+  font-size:24px;
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-family:inherit;
+}
+.yes{ background:#ff4d6d;color:white; }
+.no{ background:#333;color:white; }
+
+/* FINAL */
+.final{
+  display:none;
+  text-align:center;
+  font-size:32px;
+  color:white;
+  max-width:500px;
 }
 
-.buttons {
-  margin-top: 20px;
-  position: relative;
-  height: 140px;
+/* HEARTS */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  font-size:26px;
+  animation:float 8s linear;
 }
-
-button {
-  padding: 14px 28px;
-  font-size: 22px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.yes {
-  background: #ff4d6d;
-  color: white;
-}
-
-.no {
-  background: #444;
-  color: white;
-  position: absolute;
-}
-
-.final {
-  display: none;
-  font-size: 36px;
-  color: white;
-  text-align: center;
+@keyframes float{
+  to{ transform:translateY(-110vh); opacity:0;}
 }
 </style>
 </head>
@@ -138,121 +164,111 @@ button {
 <body>
 
 <audio id="music" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+<source src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_4f7d6a7c6c.mp3">
 </audio>
 
-<!-- Envelope -->
+<div class="mailbox" id="mailbox">
+  <div class="flag"></div>
+  <div class="mail-slot"></div>
+</div>
+
 <div class="envelope" id="envelope">
-  <div class="flap"></div>
-  <div class="stamp">💌 LOVE MAIL</div>
-  <div class="address">
-    To: Aaron 💕<br>
-    From: Rizza 💖
+
+  <div class="face back">
+    <div class="zigzag"></div>
+    <div class="postmark" id="dateStamp"></div>
+    <div class="address">From Rizza → Aaron</div>
   </div>
+
+  <div class="face front">
+    <div class="flap" id="flap"></div>
+
+    <div class="letter" id="letter">
+      <!-- ✅ UPDATED IMAGE NAME -->
+      <img src="photo.jpeg" class="photo">
+
+      <div class="type">
+        Will you be my Valentine? ❤️
+      </div>
+
+      <div>
+        <button class="yes" id="yesBtn">YES</button>
+        <button class="no" id="noBtn">NO</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Letter -->
-<div class="letter" id="letter">
-  <div class="countdown" id="countdown"></div>
-
-  <h2>Dear Aaron 💌</h2>
-  <p style="font-size:28px;">
-    Will you be my Valentine? ❤️
-  </p>
-
-  <div class="buttons" id="buttonArea">
-    <button class="yes" id="yesBtn">YES 💕</button>
-    <button class="no" id="noBtn">NO 😈</button>
-  </div>
-</div>
-
-<!-- Final -->
 <div class="final" id="finalMsg">
-  💖 I wouldn’t take NO for an answer! 💖
+I love you! ♥️<br><br>
+I’m so glad you said yes because I wouldn’t have taken no as an answer.<br><br>
+See you on our valentines date this weekend!
 </div>
 
 <script>
-const envelope = document.getElementById("envelope");
-const letter = document.getElementById("letter");
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const finalMsg = document.getElementById("finalMsg");
-const buttonArea = document.getElementById("buttonArea");
-const music = document.getElementById("music");
+const mailbox=document.getElementById("mailbox");
+const envelope=document.getElementById("envelope");
+const flap=document.getElementById("flap");
+const letter=document.getElementById("letter");
+const music=document.getElementById("music");
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const finalMsg=document.getElementById("finalMsg");
 
-/* Floating hearts generator */
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.innerText = "❤️";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = (20 + Math.random() * 30) + "px";
-  heart.style.animationDuration = (5 + Math.random() * 5) + "s";
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 8000);
-}
-setInterval(createHeart, 300);
+/* date stamp */
+const today=new Date();
+document.getElementById("dateStamp").innerText=
+`Cupid Post Office ♥️ ${today.toLocaleDateString()}`;
 
-/* Countdown to Valentine's Day */
-function updateCountdown() {
-  const now = new Date();
-  const year = now.getFullYear();
-  let valentine = new Date(year, 1, 14);
-
-  if (now > valentine) valentine = new Date(year + 1, 1, 14);
-
-  const diff = valentine - now;
-  const days = Math.floor(diff / (1000*60*60*24));
-  const hours = Math.floor(diff / (1000*60*60) % 24);
-
-  document.getElementById("countdown").innerText =
-    `❤️ ${days} days ${hours} hrs until Valentine's Day ❤️`;
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
-/* Open envelope */
-envelope.onclick = () => {
-  envelope.classList.add("open");
-
-  // Play music (required for mobile autoplay)
-  music.play().catch(()=>{});
-
-  setTimeout(() => {
-    envelope.style.display = "none";
-    letter.style.display = "block";
-    moveNoButton();
-  }, 800);
+/* mailbox click */
+mailbox.onclick=()=>{
+  mailbox.style.opacity=0;
+  setTimeout(()=>{
+    mailbox.style.display="none";
+    envelope.style.display="block";
+    music.play();
+  },800);
 };
 
-/* Move NO button */
-function moveNoButton() {
-  const area = buttonArea.getBoundingClientRect();
-  const x = Math.random() * (area.width - 100);
-  const y = Math.random() * (area.height - 60);
-  noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
-}
+/* flip envelope */
+envelope.onclick=()=> envelope.classList.toggle("flip");
 
-/* Mouse + Touch detection */
-function checkMove(clientX, clientY) {
-  const rect = noBtn.getBoundingClientRect();
-  const dist = Math.sqrt(
-    Math.pow(clientX - (rect.left + rect.width/2),2) +
-    Math.pow(clientY - (rect.top + rect.height/2),2)
-  );
-  if (dist < 60) moveNoButton();
-}
+/* drag flap */
+let dragging=false;
+flap.addEventListener("pointerdown",()=> dragging=true);
 
-document.addEventListener("mousemove", e => checkMove(e.clientX, e.clientY));
-document.addEventListener("touchmove", e => {
-  checkMove(e.touches[0].clientX, e.touches[0].clientY);
+document.addEventListener("pointermove",()=>{
+  if(!dragging) return;
+  flap.style.transform="rotateX(180deg)";
+  letter.style.display="block";
+  startHearts();
 });
+document.addEventListener("pointerup",()=> dragging=false);
 
-/* YES click */
-yesBtn.onclick = () => {
-  letter.style.display = "none";
-  finalMsg.style.display = "block";
+/* hearts */
+function startHearts(){
+  if(window.started) return;
+  window.started=true;
+
+  setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerText="❤️";
+    h.style.left=Math.random()*100+"vw";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),8000);
+  },3000);
+}
+
+/* NO button */
+noBtn.onclick=()=> noBtn.innerText="😛";
+
+/* YES button */
+yesBtn.onclick=()=>{
+  navigator.vibrate?.(200);
+  envelope.style.display="none";
+  finalMsg.style.display="block";
 };
 </script>
 
